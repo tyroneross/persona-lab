@@ -1,0 +1,35 @@
+{
+  "name": "@rosslabs/persona-lab",
+  "version": "0.2.0",
+  "description": "Task-specific AI persona panels plus a recallable, global persona library. CLI + Claude Code/Codex plugin.",
+  "type": "module",
+  "bin": {
+    "persona": "bin/persona.mjs"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "commands",
+    "agents",
+    "skills",
+    "scripts",
+    "schemas",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "personas",
+    "ui-review",
+    "ux",
+    "product",
+    "research",
+    "evaluation",
+    "cli"
+  ],
+  "author": {
+    "name": "Tyrone Ross"
+  },
+  "license": "Apache-2.0"
+}

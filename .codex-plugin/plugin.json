@@ -1,0 +1,32 @@
+{
+  "name": "persona-lab",
+  "version": "0.1.0",
+  "description": "Launch task-specific AI persona panels for UI, product, and workflow review.",
+  "author": {
+    "name": "Tyrone Ross"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "personas",
+    "ui-review",
+    "ux",
+    "product",
+    "research",
+    "evaluation"
+  ],
+  "skills": "./skills",
+  "interface": {
+    "displayName": "Persona Lab",
+    "shortDescription": "Launch task-specific persona panels for UI, product, and workflow review.",
+    "longDescription": "Persona Lab turns a user request into a focused review panel: infer likely perspectives, check access and intent, define measurements, launch independent persona passes, and report findings with evidence.",
+    "developerName": "Tyrone Ross",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Bash",
+      "Web"
+    ],
+    "defaultPrompt": "Run a persona panel for this request. Select task-specific perspectives, verify execution access, define measurements, launch the review, and report findings."
+  }
+}
