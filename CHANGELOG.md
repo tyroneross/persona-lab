@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+- Added `/persona-lab:run`: autonomously drive an AI User Personas council run to
+  completion — one independent subagent per persona pass, record findings,
+  synthesize preserving conflicts. Hard budget gate at 20 total passes.
+- Skill documents the headless council API (rosters/runs/findings/synthesis/status)
+  and the autonomous-run protocol.
+
 ## 0.2.0
 
 - Added the `persona` CLI (`bin/persona.mjs`): new/save/validate/list/show/

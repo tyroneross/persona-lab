@@ -1,6 +1,6 @@
 {
   "name": "@rosslabs/persona-lab",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Task-specific AI persona panels plus a recallable, global persona library. CLI + Claude Code/Codex plugin.",
   "type": "module",
   "bin": {
