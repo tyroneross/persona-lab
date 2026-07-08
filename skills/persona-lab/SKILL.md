@@ -238,3 +238,27 @@ as a starting point, not the final review.
 
 The legacy planner `node plugins/persona-lab/scripts/persona-plan.mjs
 "<request>"` still exists but is superseded by the `persona` CLI.
+
+## Autonomous council runs (AI User Personas app)
+
+When the AI User Personas app is running, you can drive a full council review to
+completion over its HTTP API instead of reporting inline. Use the
+`/persona-lab:run` command, or drive the API directly against
+`${APP_URL:-http://localhost:3000}`:
+
+```text
+POST /api/councils/rosters            build a roster from saved library personas
+POST /api/councils/runs               create a run {roster_id, request, level, runs_per_persona}
+GET  /api/councils/{run_id}           read the bundle + command packet
+PATCH /api/councils/{run_id}/status   ready -> running
+POST /api/councils/{run_id}/findings  record findings (validated, batch-capable)
+PUT  /api/councils/{run_id}/synthesis record synthesis; advances the run to complete
+```
+
+Drive it exactly as a manual panel: one INDEPENDENT subagent per persona pass
+(no shared transcript), abstain over fabricate, at least one adversarial pass,
+and preserve conflicts as `dissent_map` in the synthesis.
+
+Hard budget gate: `total_passes = personas x runs_per_persona`. If it exceeds 20,
+stop and get explicit confirmation before spawning subagents — each pass is a
+real LLM call. Output is hypothesis, not validation.
