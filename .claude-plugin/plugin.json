@@ -2,7 +2,8 @@
   "name": "persona-lab",
   "description": "Task-specific AI persona panels plus a recallable global persona library. CLI + Claude Code/Codex plugin.",
   "author": {
-    "name": "Tyrone Ross"
+    "name": "Tyrone Ross",
+    "url": "https://github.com/tyroneross"
   },
   "license": "Apache-2.0",
   "keywords": [
@@ -12,5 +13,7 @@
     "product",
     "research",
     "evaluation"
-  ]
+  ],
+  "repository": "https://github.com/tyroneross/persona-lab",
+  "homepage": "https://github.com/tyroneross/persona-lab"
 }
