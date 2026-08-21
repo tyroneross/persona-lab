@@ -1,0 +1,37 @@
+{
+  "fingerprint": [
+    {
+      "len": 5937,
+      "mtime_ns": 1786173600676281741,
+      "name": "2026-08-08.jsonl",
+      "tail_hash": 14632064815802664722
+    },
+    {
+      "len": 4660,
+      "mtime_ns": 1787342018951768282,
+      "name": "2026-08-21.jsonl",
+      "tail_hash": 11305758823039966697
+    }
+  ],
+  "segments": [
+    {
+      "count": 9,
+      "engagement": "2026-08-08",
+      "first_seq": 1,
+      "first_ts": "2026-08-08T06:44:03Z",
+      "last_seq": 9,
+      "last_ts": "2026-08-08T07:20:00Z",
+      "segment": "2026-08-08.jsonl"
+    },
+    {
+      "count": 6,
+      "engagement": "2026-08-21",
+      "first_seq": 10,
+      "first_ts": "2026-08-21T19:53:09Z",
+      "last_seq": 15,
+      "last_ts": "2026-08-21T19:53:38Z",
+      "segment": "2026-08-21.jsonl"
+    }
+  ],
+  "updated_at": "2026-08-21T19:53:38Z"
+}
