@@ -1,0 +1,213 @@
+<title>Persona Method Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+
+<style>
+:root{
+  --bg:#fbfbfc; --card:#ffffff; --sunk:#f2f3f5;
+  --ink:#14161a; --ink2:#3c414a; --mut:#6a707a; --faint:#9aa0aa;
+  --line:#e2e5ea; --line2:#cdd2da;
+  --acc:#3b4fb8; --accbg:#eceffb; --accln:#aeb8e6;
+  --good:#1f6b4a; --goodbg:#e8f3ee;
+  --warn:#8a5514; --warnbg:#f8efe2;
+  --sans:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1013; --card:#15181d; --sunk:#1b1f25;
+    --ink:#eceef1; --ink2:#c3c8d0; --mut:#949aa4; --faint:#6c727c;
+    --line:#252a31; --line2:#333a43;
+    --acc:#8b9bef; --accbg:#191d33; --accln:#3c4780;
+    --good:#5fc79a; --goodbg:#12291f;
+    --warn:#d7a24f; --warnbg:#2e2410;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1013; --card:#15181d; --sunk:#1b1f25;
+  --ink:#eceef1; --ink2:#c3c8d0; --mut:#949aa4; --faint:#6c727c;
+  --line:#252a31; --line2:#333a43;
+  --acc:#8b9bef; --accbg:#191d33; --accln:#3c4780;
+  --good:#5fc79a; --goodbg:#12291f;
+  --warn:#d7a24f; --warnbg:#2e2410;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:64px 28px 120px}
+@media (max-width:560px){.wrap{padding:40px 20px 80px}}
+
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--acc);margin:0 0 14px}
+h1{font-size:40px;line-height:1.12;font-weight:600;letter-spacing:-.03em;margin:0 0 18px;text-wrap:balance}
+@media (max-width:560px){h1{font-size:30px}}
+.lede{font-size:19px;line-height:1.55;color:var(--ink2);margin:0 0 10px;max-width:64ch}
+.meta{font-family:var(--mono);font-size:12px;color:var(--faint);margin:22px 0 0;
+  padding-top:16px;border-top:1px solid var(--line)}
+
+h2{font-size:23px;line-height:1.25;font-weight:600;letter-spacing:-.02em;
+  margin:56px 0 6px;text-wrap:balance}
+h3{font-size:16.5px;font-weight:600;margin:30px 0 6px;letter-spacing:-.01em}
+p{margin:0 0 15px;max-width:68ch}
+strong{font-weight:600;color:var(--ink)}
+code{font-family:var(--mono);font-size:.87em;background:var(--sunk);
+  border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+
+.verdict{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:24px 26px;margin:26px 0 8px}
+.verdict p:last-child{margin-bottom:0}
+.verdict .k{font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--faint);margin:0 0 8px}
+
+.q{border-left:2px solid var(--accln);background:var(--accbg);color:var(--ink2);
+  padding:13px 18px;border-radius:0 9px 9px 0;margin:16px 0;max-width:68ch;font-size:15.5px}
+.q .who{display:block;font-family:var(--mono);font-size:11px;color:var(--acc);
+  letter-spacing:.06em;margin-top:8px}
+
+ul{margin:0 0 15px;padding-left:20px;max-width:68ch}
+li{margin:7px 0}
+
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin:20px 0}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:14.5px}
+th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--faint);font-weight:400;padding:12px 16px;
+  background:var(--sunk);border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:12px 16px;border-bottom:1px solid var(--line);color:var(--ink2);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td strong{color:var(--ink)}
+
+.tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.07em;
+  text-transform:uppercase;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.tag.w{background:var(--goodbg);color:var(--good)}
+.tag.f{background:var(--warnbg);color:var(--warn)}
+
+.pull{font-size:20px;line-height:1.45;font-weight:500;color:var(--ink);
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:22px 0;margin:34px 0;max-width:62ch;letter-spacing:-.01em}
+
+.foot{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);
+  font-size:14px;color:var(--mut)}
+.foot code{font-size:.85em}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Method assessment</p>
+  <h1>Personas found the wall. They could not remember finding it.</h1>
+  <p class="lede">Six personas reviewed an interactive technical page with no prior context.
+    The method produced findings no checklist would have. Then five of six vanished before
+    they could be asked a follow-up question.</p>
+  <p class="meta">Study: The Fact Refinery &middot; 6 participants &middot; 2026-08-21</p>
+
+  <div class="verdict">
+    <p class="k">Verdict</p>
+    <p><strong>Keep the method. Move the memory out of the agent and into a file.</strong>
+      The personas worked. The infrastructure holding them did not. A persona held in a
+      running process has a memory measured in seconds, because a subagent becomes
+      eviction-eligible thirty seconds after it finishes.</p>
+  </div>
+
+  <h2>What worked</h2>
+
+  <h3>Blind reads found the failure the builders could not see</h3>
+  <p>Three participants independently hit the same wall in the same place: the page opened
+    with a metaphor before saying what the thing was. Nobody who had worked on it could see
+    that, because everybody who had worked on it already knew.</p>
+  <div class="q">"Cute, but where's the work?"<span class="who">Technical recruiter, first thirty seconds, on a phone</span></div>
+
+  <h3>Role-specific goals produced role-specific findings</h3>
+  <p>The value came from what each persona was <em>trying to do</em>, not from their job
+    title. The recruiter was scanning on a phone between calls. The researcher was looking
+    for a claim to attack. Those produced completely different findings from the same page.</p>
+
+  <h3>Disagreement was the product</h3>
+  <p>Two conflicts were worth more than any consensus. Experts called the glossary tooltips
+    dead weight; novices depended on them. Three participants wanted a section deleted that
+    three others named the best evidence on the page. Collapsing either into a panel view
+    would have destroyed the finding and produced a worse page.</p>
+
+  <h3>Asking for the exact phrase made findings actionable</h3>
+  <p>Every persona was told to quote the words that lost them. That turned vague discomfort
+    into a specific string a builder could locate and fix. The novice's own sentence, written
+    when asked what would have fixed their confusion, became the page's opening line
+    unedited.</p>
+
+  <h2>What did not work</h2>
+
+  <h3>Persona memory lasted thirty seconds</h3>
+  <p>Five of six follow-up interviews were lost. The transcripts still exist on disk; the
+    ability to reach them does not. The single participant who happened to still be reachable
+    then carried disproportionate weight in the analysis, which is its own bias.</p>
+
+  <h3>Participants could not reply to the researcher</h3>
+  <p>Messages arrived with no resolvable return address, so answers went to the orchestrator
+    instead of the analyst. Two hops where there should have been one.</p>
+
+  <h3>Participants are unreliable about causes</h3>
+  <p>Two reported controls as broken. Three of four were not broken. They were gated, and
+    every gate was silent. Reading the code found that. Asking the participants again would
+    have confirmed the symptom and missed the cause entirely.</p>
+
+  <h3>The method has no task-success or timing data</h3>
+  <p>These are simulated participants giving reactions, not recruited users completing tasks
+    under observation. That distinction bounds every claim the study can make, and it should
+    be stated rather than implied.</p>
+
+  <div class="pull">A reported defect and a real defect are different objects. The study's most
+    useful correction came from disbelieving a participant and checking the code.</div>
+
+  <h2>The fix: the persona is the file, not the process</h2>
+  <p>Identity already persisted. <code>personas.json</code> holds who a persona is. What was
+    missing is what a persona has <em>seen</em>. A new encounter record adds it, written by
+    the persona <strong>before it returns</strong>, so the return value is a pointer rather
+    than the only copy.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Field</th><th>Why it exists</th></tr></thead>
+    <tbody>
+      <tr><td><code>verbatim</code></td><td>Authoritative and never summarised, so any later conclusion can be checked against what was actually said.</td></tr>
+      <tr><td><code>kind</code></td><td>Separates a <strong>defect</strong> from a <strong>preference</strong>. A slider that will not move and a metaphor someone dislikes need different responses.</td></tr>
+      <tr><td><code>verified</code></td><td>Allows <strong>reclassified</strong>, not just confirmed or refuted, because a reported defect often turns out to be a silent gate.</td></tr>
+      <tr><td><code>unanswered</code></td><td>Records what a session could not settle, so the next dispatch asks it up front instead of assuming a second turn.</td></tr>
+      <tr><td><code>blind</code></td><td>A blind read asks "does this work". An informed read asks "is this better". Mixing them silently invites a persona to rationalise a position it never held.</td></tr>
+      <tr><td><code>conditions.viewports</code></td><td>Required. Half of this study's real defects existed only at phone width.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>The UX researcher layer earned its place, for an unexpected reason</h2>
+  <p>It was valuable as an <strong>adjudicator</strong>, not a summariser. Three things it did
+    that a summary pass would not:</p>
+  <ul>
+    <li>It <strong>read the code</strong> and found that three of four reported defects were
+      silent gates rather than breakage.</li>
+    <li>It <strong>contradicted a participant</strong> who believed desktop had fixed a
+      problem, correctly identifying that desktop had only moved a switch closer to the
+      control it governed.</li>
+    <li>It <strong>declined a shortcut</strong>, refusing to reconstruct the five lost
+      participants from their own prior reports, on the grounds that a persona handed its own
+      answers will rationalise rather than react.</li>
+  </ul>
+  <p>Keep the role, and give it the standing instruction that makes it work:
+    <strong>trust your own observation over a participant's memory, and say plainly when a
+    participant was mistaken.</strong> A researcher that only aggregates is a worse version of
+    reading the transcripts yourself.</p>
+
+  <h2>How to run the next one</h2>
+  <ul>
+    <li><strong>Freeze the artifact</strong> and record its version. Builder edits racing
+      participant sessions produce findings about a page that never existed.</li>
+    <li><strong>Ask everything in the first dispatch.</strong> There is no reliable second
+      turn.</li>
+    <li><strong>Run blind by default.</strong> Compare rounds at the analyst level, where both
+      are visible, rather than by showing a persona its own history.</li>
+    <li><strong>Have each persona write its encounter before returning.</strong></li>
+    <li><strong>Verify every reported defect</strong> against the artifact before treating it
+      as real.</li>
+  </ul>
+
+  <p class="foot">Now in <code>persona-lab</code>: <code>schemas/encounter.schema.json</code>,
+    <code>encounters/</code>, and <code>docs/persona-memory.md</code>. Composition doctrine is
+    unchanged; panels are for spread, not consensus. Raw participant reports for this study
+    are kept verbatim and separate from the synthesis, so every conclusion above remains
+    checkable against the source.</p>
+</div>
