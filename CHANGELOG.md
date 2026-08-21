@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.7.0
+
+Capture which panels earned their cost, and reuse the compositions that did.
+
+- `persona run lesson <run_id> --verdict valuable|mixed|wasted` records what a
+  panel produced: what changed, which findings landed, what about the METHOD
+  worked or broke, and whether the roster is worth running again.
+- `valuable` requires `--changed`. A verdict with nothing named is a compliment,
+  not a lesson, and it is the claim most likely to be wrong later. `wasted`
+  requires nothing — nothing changing is itself the finding, and it is the most
+  useful verdict to hold before composing the next panel.
+- `persona run proven` lists rosters that earned another run.
+  `persona roster from-run <run_id>` promotes the composition, and refuses a run
+  recorded as wasted.
+- The outcome renders into `report.md` above the synthesis.
+
+Deliberately NOT added: back-filling historical panels into encounters. Recall
+filters on persona, artifact, and project and has no provenance or age check, so
+a reconstructed encounter is indistinguishable from a real one at dispatch time
+and would anchor a future persona with something nobody observed. It is also the
+exact act `persona-research-adjudicator` is instructed to refuse. A past panel
+gets a lesson and, if it earned one, a roster — never manufactured memory.
+
 ## 0.6.0
 
 Temporary and persistent personas, and a recall scope that decides what a

@@ -69,6 +69,10 @@ persona panel --roster "Enterprise rollout review" --level high
 
 persona home        # print the library path
 
+# judge the panel after the fact, and reuse what worked
+persona run lesson <run_id> --verdict valuable --changed "..." --worked "a;b"
+persona run proven                 persona roster from-run <run_id> --name "..."
+
 # what a persona may bring with it (scoped by its role, not your mood)
 persona recall <persona_id> [--artifact <slug>] [--project <name>]
 

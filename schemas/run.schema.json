@@ -126,6 +126,57 @@
     },
     "notes": {
       "type": "string"
+    },
+    "outcome": {
+      "type": "object",
+      "description": "What this panel actually produced, recorded after the fact. A lesson about the run, never a reconstruction of what a persona saw \u2014 the encounters are the only record of that.",
+      "required": [
+        "verdict",
+        "recorded_at"
+      ],
+      "properties": {
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "valuable",
+            "mixed",
+            "wasted"
+          ],
+          "description": "valuable \u2014 it changed the artifact or a decision. mixed \u2014 some signal, high cost. wasted \u2014 nothing changed as a result."
+        },
+        "what_changed": {
+          "type": "string",
+          "description": "What actually changed because of this panel. If nothing, say nothing \u2014 that is the finding."
+        },
+        "landed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Finding claims that led to a real change."
+        },
+        "method_worked": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "What about the METHOD worked \u2014 composition, framing, ordering, question design."
+        },
+        "method_failed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "What about the method broke."
+        },
+        "reuse_roster": {
+          "type": "boolean",
+          "description": "Whether this roster is worth running again."
+        },
+        "recorded_at": {
+          "type": "string"
+        }
+      }
     }
   }
 }

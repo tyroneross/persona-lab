@@ -241,6 +241,35 @@ the method produces reactions from simulated participants, not task-success or
 timing data from recruited users under observation. That distinction limits
 every claim the panel can make.
 
+### Record what the panel produced
+
+A panel that nobody judged is a panel you will run the same wrong way again.
+After the artifact changes (or doesn't), record the lesson:
+
+```bash
+persona run lesson <run_id> --verdict valuable|mixed|wasted \
+  --changed "what actually changed because of this panel" \
+  --landed "finding claim;another" \
+  --worked "what about the METHOD worked" \
+  --failed "what broke" \
+  [--reuse-roster | --no-reuse-roster]
+
+persona run proven                                    # rosters that earned another run
+persona roster from-run <run_id> --name "<name>"      # promote the composition that worked
+```
+
+`valuable` requires `--changed`. A verdict with nothing named is a compliment,
+not a lesson, and it is the claim most likely to be wrong three months later.
+`wasted` needs no change — nothing changing *is* the finding, and it is the most
+useful verdict to have on record before composing the next panel.
+
+This is a lesson **about the run**. It is never a reconstruction of what a
+persona saw: encounters are the only record of that, and a persona that did not
+write one has no memory to recover. Do not manufacture encounters after the
+fact — a fabricated encounter is indistinguishable from a real one at recall
+time, so it would anchor a future dispatch with something nobody actually
+observed.
+
 ## Temporary and Persistent Personas
 
 Two properties decide what a persona *is*, and they are orthogonal.

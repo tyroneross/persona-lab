@@ -32,7 +32,7 @@ import {
 } from "../lib/encounters.mjs";
 import {
   createRun, readRun, listRuns, attachEncounter, closeRun, validateRun,
-  runEncounters, writeReport, runDir, runsDir,
+  runEncounters, writeReport, runDir, runsDir, recordOutcome, provenRosters,
 } from "../lib/runs.mjs";
 import { unlinkEncounterRun } from "../lib/encounters.mjs";
 import {
@@ -321,7 +321,33 @@ function cmdRoster(positional, flags) {
     for (const r of ROLE_LIBRARY) process.stdout.write(`${r.perspective.padEnd(14)} ${r.name}${r.adversarial ? " *adversarial" : ""}\n`);
     return;
   }
-  die("usage: persona roster <save|list|show|rm|lenses> ...");
+  if (sub === "from-run") {
+    const id = positional[1];
+    const name = flags.name && flags.name !== true ? String(flags.name) : null;
+    if (!id || !name) die('usage: persona roster from-run <run_id> --name "<roster name>" [--use-case ".."]');
+    const run = readRun(id);
+    if (!run) die(`run not found: ${id}`);
+    if (run.outcome?.verdict === "wasted") {
+      die(`run ${id} was recorded as wasted. Promote a roster that earned it, or record a different verdict first.`);
+    }
+    const lenses = [...new Set((run.roster || [])
+      .map((pid) => getPersona(pid))
+      .filter(Boolean)
+      .flatMap((p) => p.tags || []))];
+    const saved = saveRoster({
+      name,
+      lenses: lenses.length ? lenses : ["general"],
+      persona_ids: run.roster || [],
+      use_case: (flags["use-case"] && flags["use-case"] !== true)
+        ? String(flags["use-case"])
+        : `Composition that produced a ${run.outcome?.verdict || "recorded"} panel on ${run.artifact?.label || run.artifact?.slug}.`,
+    });
+    if (flags.json) return out(saved, true);
+    process.stdout.write(`saved roster "${saved.name}" from ${id}\n  ${(run.roster || []).length} personas, lenses: ${saved.lenses.join(", ")}\n`);
+    return;
+  }
+
+  die("usage: persona roster <save|list|show|rm|lenses|from-run> ...");
 }
 
 function cmdPanel(positional, flags) {
@@ -592,6 +618,46 @@ function cmdRun(positional, flags) {
     return;
   }
 
+  if (sub === "lesson") {
+    const id = rest[0];
+    if (!id) die('usage: persona run lesson <run_id> --verdict valuable|mixed|wasted [--changed ".."] [--landed "a;b"] [--worked "a;b"] [--failed "a;b"] [--reuse-roster|--no-reuse-roster]');
+    const list = (v) => (v && v !== true ? String(v).split(";").map((x) => x.trim()).filter(Boolean) : undefined);
+    const outcome = {};
+    if (flags.verdict) outcome.verdict = String(flags.verdict);
+    if (flags.changed && flags.changed !== true) outcome.what_changed = String(flags.changed);
+    if (list(flags.landed)) outcome.landed = list(flags.landed);
+    if (list(flags.worked)) outcome.method_worked = list(flags.worked);
+    if (list(flags.failed)) outcome.method_failed = list(flags.failed);
+    if (flags["reuse-roster"]) outcome.reuse_roster = true;
+    if (flags["no-reuse-roster"]) outcome.reuse_roster = false;
+
+    let r;
+    try {
+      r = recordOutcome(id, outcome);
+    } catch (e) {
+      die(e.message);
+    }
+    const file = writeReport(r);
+    if (flags.json) return out({ run_id: r.run_id, outcome: r.outcome, report: file }, true);
+    process.stdout.write(`recorded ${r.outcome.verdict} on ${r.run_id}\n  ${file}\n`);
+    return;
+  }
+
+  if (sub === "proven") {
+    const rows = provenRosters();
+    if (flags.json) return out({ count: rows.length, rosters: rows }, true);
+    if (!rows.length) return process.stdout.write("No run has been marked valuable yet.\nRecord one with `persona run lesson <run_id> --verdict valuable --changed \"...\"`.\n");
+    for (const r of rows) {
+      process.stdout.write(
+        `${r.run_id}  [${r.verdict}]\n  ${r.artifact} — ${String(r.when).slice(0, 10)}\n` +
+        `  ${r.what_changed || "(no change recorded)"}\n` +
+        `  roster: ${r.roster.join(", ")}\n` +
+        (r.method_worked.length ? `  worked: ${r.method_worked.join("; ")}\n` : "")
+      );
+    }
+    return;
+  }
+
   if (sub === "close") {
     const id = rest[0];
     if (!id) die("usage: persona run close <run_id> [--synthesis <file|-|text>] [--abandoned]");
@@ -612,7 +678,7 @@ function cmdRun(positional, flags) {
     return;
   }
 
-  die("usage: persona run <new|list|show|report|close> ...");
+  die("usage: persona run <new|list|show|report|close|lesson|proven> ...");
 }
 
 // --- recall: what a persona is allowed to bring with it --------------------
@@ -654,6 +720,8 @@ function usage() {
       "  persona encounter save <file|-> | validate <file|-> | list [<persona_id>] | show <encounter_id>",
       '  persona run new "<request>" --artifact <slug> --version <v> --personas id1,id2',
       "  persona run list | show <run_id> | report <run_id> | close <run_id> [--synthesis <file|->]",
+      "  persona run lesson <run_id> --verdict valuable|mixed|wasted --changed \"..\" [--worked \"a;b\"]",
+      "  persona run proven                 persona roster from-run <run_id> --name \"..\"",
       "  persona recall <persona_id> [--artifact <slug>] [--project <name>] [--limit N]",
       "  persona home",
       "",

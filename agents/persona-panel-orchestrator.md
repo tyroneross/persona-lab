@@ -95,5 +95,9 @@ Report format:
 - Unanswered questions to ask up front in the next dispatch.
 - Assumptions and access gaps.
 - The run: `run_id`, and the generated `report.md` path from `persona run close`.
+- Before composing a panel, check `persona run proven` — a roster that already
+  earned a verdict beats one you assemble fresh. After the artifact changes,
+  record `persona run lesson <run_id>` so the next panel is composed on evidence
+  rather than on memory of a panel that felt useful.
 - Encounter records written (paths or `encounter_id`s).
 - Recommended next actions.
