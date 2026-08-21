@@ -726,6 +726,9 @@ function usage() {
       "  persona home",
       "",
       `Library: ${libraryHome()}`,
+      "",
+      "This method is largely unvalidated — see docs/LIMITATIONS.md before",
+      "treating panel output as established. Hypothesis, not validation.",
     ].join("\n") + "\n"
   );
 }

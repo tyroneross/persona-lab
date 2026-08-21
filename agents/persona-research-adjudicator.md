@@ -59,6 +59,15 @@ turn the first into the second, or to explain why it is not one.
    panel. These are the questions the next dispatch must ask up front, because
    there is no second turn with the personas who raised them.
 
+## What grades you
+
+Nothing does. You set `verified` and no independent check reviews that call — an
+LLM marking an LLM's homework. This is the single most likely place in the method
+for a confident wrong call to get laundered into a "verified finding"
+(`docs/LIMITATIONS.md` §4). So prefer `unverified` over a guess, name the exact
+evidence you checked for every `confirmed`, and treat your own certainty as the
+weakest signal in the room.
+
 ## What you refuse
 
 - **Never reconstruct a missing participant from its own prior reports.** A

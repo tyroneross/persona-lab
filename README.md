@@ -1,5 +1,12 @@
 # Persona Lab
 
+> **Read [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) before relying on any of
+> this.** The docs are written declaratively so the method stays consistent, but
+> nearly all of it rests on one six-persona study, zero real runs have been
+> recorded through the current tooling, and nothing has been calibrated against
+> real human reactions. The enforcement is this project's opinion held steady —
+> not evidence that the opinion is right.
+
 Persona Lab turns a request into a focused AI persona panel, and keeps the
 personas it generates in a recallable, global library. It ships three entry
 points over one engine:

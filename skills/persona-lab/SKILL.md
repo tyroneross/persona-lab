@@ -5,6 +5,18 @@ description: Use when the user asks to launch, spin up, or dispatch personas —
 
 # Persona Lab
 
+> **Before you follow any of this: read `docs/LIMITATIONS.md`.**
+> This document is written in a declarative voice — "always run blind first",
+> "a first impression is non-renewable". That is a design stance stated plainly
+> so it can be followed consistently and argued with. It is **not** a report of
+> validated findings. Nearly all of it rests on a single six-persona study on one
+> artifact on one day, the live library has recorded zero real runs to date, and
+> the method has never been calibrated against how actual humans reacted to the
+> same artifact. The schemas will enforce these opinions against you; that is
+> consistency, not evidence. Treat the enforcement as this project's position and
+> say so when you report results.
+
+
 ## Objective
 
 Turn a user query or request into a focused persona panel that can review a UI,

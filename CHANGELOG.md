@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.7.1
+
+Say plainly what this method has not earned.
+
+The docs are written in a declarative voice so the method stays consistent and
+arguable. Read cold — by a new agent that just loaded the plugin and is being
+refused by its schemas — that voice reads as validated practice. It is not.
+
+- `docs/LIMITATIONS.md` gives every load-bearing claim its provenance: which
+  come from the single six-persona source study, which are measured (the usage
+  audit, and only that), and which are asserted design stances with no evidence
+  at all (the recall defaults, the `none` default, panel size).
+- It records that the live library holds 6 personas, 0 encounters, and 0 runs —
+  everything added in 0.4.0-0.7.0 has been exercised only by its own tests.
+- It names the ten gaps that would actually change confidence, ordered. The
+  first is that nothing has ever been calibrated against how real humans reacted
+  to the same artifact, which no control in this repo would catch.
+- The pointer is on every entry surface a new agent can arrive through: the top
+  of SKILL.md before any instruction, the README, `persona help`, and all three
+  agents.
+- `persona-research-adjudicator` now states that nothing grades it — it is an
+  LLM marking an LLM's homework, and the likeliest place a confident wrong call
+  becomes a "verified finding".
+- `persona-perspective-reviewer` opens by saying it is a simulated participant,
+  not a user.
+- New rule for contributors: a claim added to the docs adds its provenance row in
+  the same commit. Without that, an assertion becomes indistinguishable from a
+  finding within about two commits — which is how the declarative voice happened.
+
 ## 0.7.0
 
 Capture which panels earned their cost, and reuse the compositions that did.

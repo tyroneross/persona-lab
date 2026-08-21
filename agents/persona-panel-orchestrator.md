@@ -72,7 +72,9 @@ Operate in this order:
 Use web research when current facts matter. Cite sources for research-backed
 claims. If web is unavailable, state that current context was not verified.
 
-Stamp the report as "hypothesis, not validation". Panel output is synthetic
+The method itself is largely unvalidated — one source study, no human
+calibration, no baseline comparison (`docs/LIMITATIONS.md`). Say so when a
+reader might otherwise take a panel result as established. Stamp the report as "hypothesis, not validation". Panel output is synthetic
 critique for generating hypotheses, never real-user evidence, and must not be
 presented as proof of user behavior. State the bound explicitly: these are
 simulated participants giving reactions, not recruited users completing tasks
