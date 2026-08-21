@@ -87,6 +87,11 @@ If access is missing but the review can proceed, label the review as synthetic
 and list access gaps. If access is required to avoid a misleading answer, ask
 one concise blocking question.
 
+**Freeze the artifact before any persona sees it.** Snapshot it, record a
+`version` string, and pass that version to every persona. Builder edits racing
+persona passes produce findings about a page that never existed, and afterwards
+you cannot tell which findings those were.
+
 Do not claim that you tested a UI, searched the web, inspected analytics, or
 verified behavior unless the relevant tool was used or the evidence was
 provided.
@@ -125,13 +130,28 @@ half the time instead of admitting uncertainty. A persona that cannot judge a
 point from the available evidence must answer "cannot judge from available
 evidence" or "no concern" honestly, rather than invent a finding.
 
+**Ask everything in the first dispatch.** A persona subagent becomes
+eviction-eligible roughly thirty seconds after it finishes. There is no reliable
+follow-up interview. A question you plan to ask in a second turn is a question
+you will not get to ask, so put it in the brief now. Anything a persona cannot
+settle goes into its `unanswered` list rather than into a follow-up.
+
+**Run blind by default.** A blind pass asks "does this work". An informed pass
+asks "is this better than before" and must name the exact prior `encounter_id`s
+the persona was shown. Never mix them silently: a persona handed its own prior
+answers rationalises a position it never held. Compare rounds at the synthesis
+level, where both are visible, not by showing a persona its own history.
+
 Preferred launch path when subagents are available:
 
 1. Use `persona-panel-orchestrator` to select personas and measurement.
 2. Launch `persona-perspective-reviewer` once per persona, each with the
-   assigned persona, artifact, and measurement criteria, and no knowledge of the
-   other personas or their findings.
+   assigned persona, frozen artifact version, and measurement criteria, and no
+   knowledge of the other personas or their findings.
 3. Keep each review independent until synthesis.
+4. Require each persona to write its encounter file *before returning*, and
+   collect the paths. See "Encounter memory" below.
+5. Run `persona-research-adjudicator` before synthesis.
 
 Fallback launch path:
 
@@ -152,12 +172,16 @@ Required report:
 
 ```text
 Bottom line:
-What was inspected:
+What was inspected (artifact + frozen version):
 Persona roster:
 Measurement:
 Priority findings:
 Persona-specific findings:
+Conflicts, preserved rather than resolved:
+Adjudication (confirmed / reclassified / refuted / unverified):
+Unanswered — ask these up front next time:
 Access gaps and assumptions:
+Encounter records written:
 Recommended next actions:
 ```
 
@@ -172,13 +196,68 @@ Findings should include:
 - Fix: concrete recommendation.
 - Confidence: high, medium, or low.
 
+**Verify every reported defect against the artifact before treating it as real.**
+A reported defect and a real defect are different objects. Personas are reliable
+about symptoms and unreliable about causes: in the study that shaped this
+workflow, three of four controls reported as broken were not broken, they were
+gated, and every gate was silent. Reading the code found that; asking the
+personas again would have confirmed the symptom and missed the cause. Mark each
+finding `confirmed`, `refuted`, `reclassified`, or `unverified`, and say plainly
+where a persona was mistaken.
+
 Keep the synthesis decisive, but preserve conflicts as explicit tradeoffs rather
 than averaging them away. For example: power user wants density versus novice
 wants simplicity. Preserve dissenting critical findings when one persona flags an
 issue that others do not.
 
 Stamp the report as "hypothesis, not validation". These are synthetic
-perspectives, not real-user evidence.
+perspectives, not real-user evidence. State the bound rather than implying it:
+the method produces reactions from simulated participants, not task-success or
+timing data from recruited users under observation. That distinction limits
+every claim the panel can make.
+
+## Encounter Memory
+
+`personas.json` holds who a persona is. Encounters hold what it has *seen*. Both
+live in the global library, so a persona recalled in any repo carries its
+history:
+
+```text
+~/.persona-lab/personas.json                 who they are, stable
+~/.persona-lab/encounters/<persona_id>/*.json  what they met, append-only
+```
+
+A persona held in a running agent has a memory measured in seconds. Continuity
+lives in files; a running agent is a temporary reader of those files, never the
+place state is kept.
+
+```bash
+persona encounter new <persona_id> --artifact <slug> --label "<label>" --version "<v>"
+#   emits a scaffold. --informed id1,id2 marks the pass informed rather than blind.
+persona encounter save <file|->      persona encounter validate <file|->
+persona encounter list [<persona_id>] [--artifact <slug>]
+persona encounter show <encounter_id>
+```
+
+Five fields carry the method, and the validator enforces them:
+
+- **`verbatim`** is authoritative and never summarised. Structured `findings`
+  are a lossy extraction kept beside it so any conclusion stays checkable
+  against what was actually said.
+- **`kind`** separates a `defect` from a `preference`. A control that will not
+  move and a metaphor someone dislikes need different responses.
+- **`verified`** allows `reclassified`, not only confirmed or refuted, because a
+  reported defect often turns out to be a silent gate.
+- **`unanswered`** records what a session could not settle, so the next dispatch
+  asks it up front instead of assuming a second turn.
+- **`conditions.viewports`** is required. Half of the source study's real
+  defects existed only at phone width.
+
+Encounters are append-only: a saved `encounter_id` is never overwritten. A
+second look is a second encounter.
+
+Full contract: `docs/persona-memory.md`. Method assessment that produced it:
+`docs/persona-method-assessment.html`.
 
 ## Review Levels
 
@@ -221,6 +300,13 @@ measurement, independence rules, and guardrails) for you to execute:
 
 ```bash
 persona panel "<topic>" [--roster <name> | --auto] [--level low|medium|high]
+```
+
+Record what a persona saw (before the persona returns):
+
+```bash
+persona encounter new <persona_id> --artifact <slug> --label ".." --version ".."
+persona encounter save <file|->      persona encounter list [<persona_id>]
 ```
 
 Other commands:

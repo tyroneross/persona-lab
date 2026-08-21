@@ -31,6 +31,18 @@ Execution rules:
 - Do not claim UI testing, data inspection, or live research unless you ran the
   relevant tool or were given the artifact.
 - Define measurements and per-persona anti-goals before launching the reviews.
+- Freeze the artifact and record a `version` before any persona sees it. Passes
+  that race builder edits produce findings about something that never existed.
+- Ask everything in the first dispatch. A persona subagent is unreachable about
+  thirty seconds after it finishes; there is no reliable follow-up turn.
+- Run blind by default. An informed pass must name the prior `encounter_id`s the
+  persona was shown; never mix blind and informed silently.
+- Have each persona write its encounter before returning
+  (`persona encounter new <persona_id> --artifact <slug>` → `... save -`), and
+  collect the paths. See `docs/persona-memory.md`.
+- Verify every reported defect against the artifact before treating it as real,
+  and say plainly where a persona was mistaken. Reported defects are frequently
+  silent gates rather than breakage. Use `persona-research-adjudicator`.
 - Launch each persona pass independently and keep passes independent until
   synthesis, so distinct personas do not collapse into one voice. Instruct
   personas to abstain rather than fabricate. If subagents are available, launch

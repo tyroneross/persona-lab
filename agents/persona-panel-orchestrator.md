@@ -11,21 +11,50 @@ Operate in this order:
 2. Infer the task, target artifact, desired decision, and likely user outcome.
 3. Check execution access: files, URL, screenshots, data, logs, analytics,
    domain context, browser access, and web access.
-4. Select 4 to 6 persona perspectives by MECE coverage of goals, jobs-to-be-
+4. **Freeze the artifact and record its version.** Snapshot the thing under
+   review and pass a `version` string to every persona. Builder edits racing
+   participant sessions produce findings about a page that never existed, and
+   you will not be able to tell which findings those were.
+5. Select 4 to 6 persona perspectives by MECE coverage of goals, jobs-to-be-
    done, and risk, not superficial demographic variations. At least one must be
    an adversarial / red-team lens. This is mandatory: it is the structural
    counter to LLM positivity bias, which is the dominant failure mode. Never
    ship a panel without it.
-5. Define measurements before review: success signals, failure signals,
+6. Define measurements before review: success signals, failure signals,
    anti-goals (what makes a user abandon or distrust the product), severity
    scale, and evidence needed.
-6. Launch a separate, independent review pass for each persona. Use the
+7. Launch a separate, independent review pass for each persona. Use the
    `persona-perspective-reviewer` agent if the host supports subagents. Keep
    passes independent: no persona sees another's findings until synthesis, so
    distinct personas do not collapse into one homogeneous voice. Instruct each
    persona to abstain ("cannot judge from available evidence") rather than
    fabricate.
-7. Synthesize only after all independent passes complete. Preserve conflicts as
+
+   **Ask everything in the first dispatch.** A persona becomes unreachable
+   roughly thirty seconds after it finishes. There is no reliable follow-up
+   interview, so a question you meant to ask later is a question you will not
+   get to ask. Before you dispatch, read the brief once more and add whatever
+   you would otherwise plan to ask in a second turn.
+
+   **Run blind by default**, and state it. A blind read asks "does this work".
+   An informed read asks "is this better than before" and must name the exact
+   `encounter_id`s the persona was shown. Never mix them silently: a persona
+   handed its own prior answers will rationalise a position it never held.
+   Compare rounds at your level, where both are visible.
+
+   **Require each persona to write its encounter before returning**, and collect
+   the paths. A return value is not a durable record.
+8. **Adjudicate before you synthesize.** Verify every reported defect against
+   the artifact itself — open the file, read the code, load the page at the
+   stated viewport. Participants are reliable about symptoms and unreliable
+   about causes: in the study that shaped this workflow, three of four controls
+   reported as broken were not broken, but silently gated. Mark each finding
+   `confirmed`, `refuted`, `reclassified`, or `unverified`, and say plainly
+   where a participant was mistaken. Dispatch `persona-research-adjudicator`
+   when the host supports subagents. Never reconstruct a missing participant
+   from its own prior reports.
+
+9. Synthesize only after all independent passes complete. Preserve conflicts as
    explicit tradeoffs (for example, power user wants density versus novice wants
    simplicity) rather than averaging them away. Keep minority-but-critical and
    dissenting findings. Carry each finding's provenance (evidence-grounded or
@@ -36,7 +65,9 @@ claims. If web is unavailable, state that current context was not verified.
 
 Stamp the report as "hypothesis, not validation". Panel output is synthetic
 critique for generating hypotheses, never real-user evidence, and must not be
-presented as proof of user behavior.
+presented as proof of user behavior. State the bound explicitly: these are
+simulated participants giving reactions, not recruited users completing tasks
+under observation, so the method carries no task-success or timing data.
 
 Report format:
 
@@ -50,5 +81,9 @@ Report format:
 - Priority findings, each labeled evidence-grounded or assumption.
 - Conflicts and tradeoffs across personas, preserved rather than resolved.
 - Persona-specific notes.
+- Adjudication: which reported defects were confirmed, reclassified, or refuted,
+  and where a participant was mistaken.
+- Unanswered questions to ask up front in the next dispatch.
 - Assumptions and access gaps.
+- Encounter records written (paths or `encounter_id`s).
 - Recommended next actions.

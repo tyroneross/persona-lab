@@ -13,6 +13,8 @@
  *   persona roster save <name> --lenses a,b,c [--personas id1,id2] [--use-case ..] [--desc ..]
  *   persona roster list / show <name> / rm <name>
  *   persona panel "<topic>" [--roster <name> | --auto] [--level low|medium|high]
+ *   persona encounter new <persona_id> --artifact <slug> [--label ..] [--version ..] [--informed ids]
+ *   persona encounter save <file|->  | validate <file|-> | list [<persona_id>] | show <encounter_id>
  *   persona home
  *
  * Add --json to most commands for machine output.
@@ -25,6 +27,9 @@ import {
   searchPersonas, validatePersona, evidenceId,
   listRosters, getRoster, saveRoster, removeRoster,
 } from "../lib/library.mjs";
+import {
+  scaffoldEncounter, saveEncounter, validateEncounter, listEncounters, getEncounter, encountersDir,
+} from "../lib/encounters.mjs";
 import { ROLE_LIBRARY, DEFAULT_CRITIQUE_LENSES, selectRoles, findRole, isAdversarial } from "../lib/roles.mjs";
 
 // --- arg parsing -----------------------------------------------------------
@@ -362,6 +367,105 @@ function cmdPanel(positional, flags) {
   process.stdout.write(`\n${plan.reminder}\n`);
 }
 
+// --- encounters: what a persona has SEEN --------------------------------------
+
+function cmdEncounter(positional, flags) {
+  const [sub, ...rest] = positional;
+
+  if (sub === "new") {
+    const personaId = rest[0];
+    if (!personaId) die('usage: persona encounter new <persona_id> --artifact <slug> [--label ".."] [--version ".."] [--url ".."] [--informed id1,id2] [--viewports a,b]');
+    if (!getPersona(personaId)) die(`persona not found in the library: ${personaId}\nRun 'persona list' or save the persona first.`);
+    if (!flags.artifact) die("--artifact <slug> is required: an encounter is always with a named artifact");
+
+    const informed = flags.informed ? String(flags.informed).split(",").map((x) => x.trim()).filter(Boolean) : [];
+    const e = scaffoldEncounter({
+      persona_id: personaId,
+      artifact: {
+        slug: flags.artifact,
+        label: flags.label || flags.artifact,
+        url: flags.url || undefined,
+        version: flags.version || undefined,
+        frozen: Boolean(flags.version),
+      },
+      blind: informed.length === 0,
+      prior: informed,
+      viewports: flags.viewports ? String(flags.viewports).split(",").map((x) => x.trim()).filter(Boolean) : undefined,
+      driver: flags.driver || undefined,
+      time_budget: flags["time-budget"] || undefined,
+    });
+
+    if (flags.json) return out(e, true);
+    process.stdout.write(`${JSON.stringify(e, null, 2)}\n`);
+    process.stderr.write(
+      "\nFill this in and pipe it back BEFORE you return:\n" +
+      "  persona encounter save -\n" +
+      "`verbatim` is authoritative and is never summarised. Anything you could not settle\n" +
+      "goes in `unanswered` — there is no reliable second turn.\n"
+    );
+    return;
+  }
+
+  if (sub === "save" || sub === "validate") {
+    const raw = readInputFile(rest[0]);
+    let parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (e) {
+      die(`input is not valid JSON: ${e.message}`);
+    }
+    const items = Array.isArray(parsed) ? parsed : [parsed];
+
+    if (sub === "validate") {
+      const results = items.map((e) => ({ encounter_id: e.encounter_id || "(none)", ...validateEncounter(e) }));
+      const ok = results.every((r) => r.ok);
+      if (flags.json) out({ ok, results }, true);
+      else for (const r of results) {
+        process.stdout.write(`${r.ok ? "OK" : "FAIL"}  ${r.encounter_id}${r.ok ? "" : "\n  - " + r.errors.join("\n  - ")}\n`);
+      }
+      process.exit(ok ? 0 : 1);
+    }
+
+    const saved = [];
+    for (const e of items) {
+      try {
+        saved.push(saveEncounter(e));
+      } catch (err) {
+        die(`could not save ${e.encounter_id || "(unnamed)"}: ${err.message}`);
+      }
+    }
+    if (flags.json) return out({ saved: saved.map((s) => ({ encounter_id: s.encounter.encounter_id, path: s.path })) }, true);
+    saved.forEach((s) => process.stdout.write(`saved ${s.encounter.encounter_id}\n  ${s.path}\n`));
+    return;
+  }
+
+  if (sub === "list") {
+    const rows = listEncounters({ persona_id: rest[0], artifact: flags.artifact });
+    if (flags.json) return out({ count: rows.length, encounters: rows }, true);
+    if (!rows.length) return process.stdout.write(`No encounters yet.\nStore: ${encountersDir()}\n`);
+    for (const e of rows) {
+      const n = (e.findings || []).length;
+      const un = (e.unanswered || []).length;
+      process.stdout.write(
+        `${e.encounter_id}\n  ${e.persona_id} met ${e.artifact.label}${e.artifact.version ? ` @ ${e.artifact.version}` : ""}` +
+        ` — ${e.blind ? "blind" : "informed"}, ${e.started_at.slice(0, 10)}\n` +
+        `  ${n} finding${n === 1 ? "" : "s"}, ${un} unanswered, viewports: ${(e.conditions?.viewports || []).join(", ")}\n`
+      );
+    }
+    return;
+  }
+
+  if (sub === "show") {
+    const e = getEncounter(rest[0]);
+    if (!e) die(`encounter not found: ${rest[0] || "(none)"}`);
+    if (flags.json) return out(e, true);
+    process.stdout.write(`${JSON.stringify(e, null, 2)}\n`);
+    return;
+  }
+
+  die("usage: persona encounter <new|save|validate|list|show> ...");
+}
+
 function usage() {
   process.stdout.write(
     [
@@ -375,6 +479,8 @@ function usage() {
       "  persona roster save <name> --lenses a,b,c [--personas ids] [--use-case ..] [--desc ..]",
       "  persona roster list | show <name> | rm <name> | lenses",
       '  persona panel "<topic>" [--roster <name> | --auto] [--level low|medium|high] [--json]',
+      "  persona encounter new <persona_id> --artifact <slug> [--label ..] [--version ..] [--informed ids]",
+      "  persona encounter save <file|-> | validate <file|-> | list [<persona_id>] | show <encounter_id>",
       "  persona home",
       "",
       `Library: ${libraryHome()}`,
@@ -400,6 +506,7 @@ function main() {
     case "archive": return cmdArchive(positional, flags);
     case "roster": return cmdRoster(positional, flags);
     case "panel": return cmdPanel(positional, flags);
+    case "encounter": return cmdEncounter(positional, flags);
     case undefined:
     case "help":
     case "--help":

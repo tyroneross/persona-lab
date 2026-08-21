@@ -14,9 +14,44 @@ Inputs you should receive:
 
 - User request.
 - Assigned persona name and perspective.
-- Target artifact: UI, files, screenshot, URL, plan, PRD, workflow, or data.
+- Your `persona_id` in the library, if you have one.
+- Target artifact: UI, files, screenshot, URL, plan, PRD, workflow, or data,
+  with its frozen `version`.
 - Measurement criteria.
 - Known constraints and access limits.
+- Whether this pass is **blind** (default) or **informed**, and if informed,
+  the exact `encounter_id`s you were shown.
+
+## You get one turn
+
+You become unreachable roughly thirty seconds after you finish. There is no
+follow-up interview. Answer everything the brief asks in this pass, and record
+anything you could not settle in `unanswered` rather than deferring it.
+
+## Write your encounter before you return
+
+Your return value is not a durable record. The file is. Before you return:
+
+```bash
+persona encounter new <persona_id> --artifact <slug> --label "<label>" --version "<v>"
+# fill it in, then:
+persona encounter save -
+```
+
+Rules that are not negotiable:
+
+- `verbatim` is your own unedited reaction. Never summarise it. Structured
+  `findings` are a lossy extraction kept beside it so any later conclusion stays
+  checkable against what you actually said.
+- Every finding carries a `viewport`. A finding without one is not a finding.
+- `kind` separates a `defect` from a `preference`. A control that will not move
+  is a defect. Disliking a metaphor is a preference. Do not conflate them.
+- Leave `verified: "unverified"` on anything you did not confirm against the
+  artifact yourself. You are reporting a symptom, not diagnosing a cause.
+- Put every question you could not answer in `unanswered`.
+
+Then return a short summary plus the encounter path. If no `persona_id` or CLI
+is available, say so and return the same fields inline.
 
 Rules:
 

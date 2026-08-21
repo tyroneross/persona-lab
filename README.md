@@ -37,8 +37,9 @@ The library lives at `~/.persona-lab/` by default (override with
 
 ```text
 ~/.persona-lab/
-  personas.json          { schema_version, personas[] }
-  rosters/<slug>.json     named lens/persona presets for a use-case
+  personas.json               { schema_version, personas[] }
+  rosters/<slug>.json          named lens/persona presets for a use-case
+  encounters/<persona_id>/*.json   what each persona has seen, append-only
 ```
 
 ## CLI
@@ -66,7 +67,28 @@ persona panel "review the settings redesign" --level medium
 persona panel --roster "Enterprise rollout review" --level high
 
 persona home        # print the library path
+
+# what a persona has SEEN — written by the persona before it returns
+persona encounter new <persona_id> --artifact <slug> --label ".." --version ".."
+persona encounter save <file|->   |  validate <file|->
+persona encounter list [<persona_id>] [--artifact <slug>]  |  show <encounter_id>
 ```
+
+### Encounter memory
+
+`personas.json` holds who a persona is. Encounters hold what it has *seen*. A
+persona held in a running agent has a memory measured in seconds — a subagent
+becomes eviction-eligible about thirty seconds after it finishes — so continuity
+lives in files and a running agent is only a temporary reader of them.
+
+`verbatim` is authoritative and never summarised; `findings` are a lossy
+extraction kept beside it. `kind` separates a defect from a preference,
+`verified` allows `reclassified` (a reported defect is often a silent gate),
+`unanswered` carries what a session could not settle into the next dispatch, and
+`conditions.viewports` is required. Encounters are append-only.
+
+Contract: `docs/persona-memory.md`. Method assessment behind it:
+`docs/persona-method-assessment.html`.
 
 The CLI is the deterministic substrate: it owns the library, schema validation,
 lens selection, and review planning. Generating persona *content* and running
@@ -104,17 +126,22 @@ persona-lab/
   bin/persona.mjs                  CLI
   lib/library.mjs                  global library (personas + rosters) + validation
   lib/roles.mjs                    lens catalog + selection (>=1 adversarial)
+  lib/encounters.mjs               encounter store + validation (global library)
+  schemas/persona.schema.json      who a persona is
+  schemas/encounter.schema.json    what a persona has seen
   commands/persona-review.md
   agents/persona-panel-orchestrator.md
   agents/persona-perspective-reviewer.md
+  agents/persona-research-adjudicator.md
   skills/persona-lab/SKILL.md
   skills/persona-lab/references/persona-selection.md
   scripts/persona-plan.mjs         legacy first-pass planner (superseded by `persona new`)
 ```
 
-## Persona schema
+## Schemas
 
-Canonical contract: `schemas/persona.schema.json` (v1.1.0). Load-bearing
+Canonical contracts: `schemas/persona.schema.json` (v1.1.0) for identity,
+`schemas/encounter.schema.json` (v1.0.0) for what a persona has seen. Load-bearing
 fields are goals, behaviors, frustrations, motivations, needs, and
 `job_to_be_done`; demographics are optional decoration. `provenance`
 (`proto | qualitative | synthetic-grounded | synthetic-assumed`) and `anti_goals`

@@ -47,6 +47,16 @@ over the council API.
    - Abstain ("cannot judge from available evidence") rather than fabricate.
    - Ensure at least one pass takes an adversarial / red-team stance.
    - Return a structured finding, or none if there is genuinely no concern.
+   - Ask everything in this dispatch: a pass is unreachable ~30s after it
+     finishes, so anything it cannot settle goes into `unanswered`, not into a
+     follow-up turn.
+   - If the persona exists in the library, write an encounter file BEFORE
+     returning (`persona encounter new <persona_id> --artifact <slug> --version
+     <frozen-version>`, fill it in, `persona encounter save -`) and return the
+     path. A council `finding` is a lossy extraction; the encounter keeps the
+     `verbatim` it came from. See `docs/persona-memory.md`.
+
+   Freeze `target_artifacts` and record a version before step 4 begins.
 
 5. **Record findings.** For each finding:
    `POST {base}/api/councils/{run_id}/findings` with

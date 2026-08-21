@@ -21,10 +21,28 @@ Identity already worked this way: `personas.json` holds who a persona is, valida
 `schemas/persona.schema.json`. What was missing is the other half, what a persona has *seen*.
 `schemas/encounter.schema.json` adds it.
 
+Both halves live in the **global library**, so a persona recalled from any repo
+carries its history with it:
+
 ```
-personas.json                     who they are, stable
-encounters/<persona_id>/*.json    what they met, append-only, one file per session
+~/.persona-lab/personas.json                    who they are, stable
+~/.persona-lab/encounters/<persona_id>/*.json   what they met, append-only
 ```
+
+(`PERSONA_LAB_HOME` overrides the root. This repo's `encounters/` directory holds
+the source study that produced this document, not the live store.)
+
+The CLI owns both:
+
+```bash
+persona encounter new <persona_id> --artifact <slug> --label "<label>" --version "<v>"
+persona encounter save <file|->      persona encounter validate <file|->
+persona encounter list [<persona_id>] [--artifact <slug>]
+persona encounter show <encounter_id>
+```
+
+`persona encounter save` refuses an `encounter_id` it has already recorded.
+Encounters are append-only; a second look is a second encounter.
 
 ## The contract every persona session follows
 
