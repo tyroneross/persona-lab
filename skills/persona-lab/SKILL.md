@@ -144,6 +144,8 @@ level, where both are visible, not by showing a persona its own history.
 
 Preferred launch path when subagents are available:
 
+0. Open the run: `persona run new ... --version <frozen>`. Pass the `run_id` to
+   every persona so its encounter joins the panel.
 1. Use `persona-panel-orchestrator` to select personas and measurement.
 2. Launch `persona-perspective-reviewer` once per persona, each with the
    assigned persona, frozen artifact version, and measurement criteria, and no
@@ -238,6 +240,42 @@ perspectives, not real-user evidence. State the bound rather than implying it:
 the method produces reactions from simulated participants, not task-success or
 timing data from recruited users under observation. That distinction limits
 every claim the panel can make.
+
+## Run Memory
+
+A panel is a durable object, not a conversation that ends. Open a run before the
+first persona is dispatched and close it after adjudication:
+
+```bash
+persona run new "<the question the panel is judging>" \
+  --artifact <slug> --label "<label>" --version <frozen-version> \
+  --personas id1,id2,id3 [--level medium]
+
+# each persona writes its encounter against the run
+persona encounter new <persona_id> --run <run_id> --artifact <slug> --version <v>
+
+persona run close <run_id> --synthesis <file|->      # pools every `unanswered`
+persona run list | show <run_id> | report <run_id>
+```
+
+```text
+~/.persona-lab/runs/<run_id>/run.json    roster, frozen artifact, lanes, status
+~/.persona-lab/runs/<run_id>/report.md   generated — verbatims, findings, splits
+~/.persona-lab/runs/<run_id>/notes/      anything you or an agent adds
+```
+
+Three properties the run record enforces rather than recommends:
+
+- **`--version` is required to open a run.** The freeze rule stops being advice.
+- **A debate lane cannot precede a blind lane.** Order is the safety property.
+- **A closed run refuses new encounters.** The encounter is still saved — a
+  persona's verbatim is never discarded — but its pointer is demoted to
+  `unlinked_run_id` so it cannot appear in a report for a panel that had closed.
+
+History reads both directions: `persona run show` lists everyone on this panel,
+`persona encounter list <persona_id>` lists every panel that persona sat on.
+Encounters stay indexed by persona because a persona's history across panels is
+what makes it worth keeping.
 
 ## Encounter Memory
 

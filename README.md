@@ -40,6 +40,7 @@ The library lives at `~/.persona-lab/` by default (override with
   personas.json               { schema_version, personas[] }
   rosters/<slug>.json          named lens/persona presets for a use-case
   encounters/<persona_id>/*.json   what each persona has seen, append-only
+  runs/<run_id>/{run.json,report.md}  what happened in each panel
 ```
 
 ## CLI
@@ -67,6 +68,10 @@ persona panel "review the settings redesign" --level medium
 persona panel --roster "Enterprise rollout review" --level high
 
 persona home        # print the library path
+
+# a panel as a durable object you can open months later
+persona run new "<question>" --artifact <slug> --version <v> --personas id1,id2
+persona run list | show <run_id> | report <run_id> | close <run_id> [--synthesis <file|->]
 
 # what a persona has SEEN — written by the persona before it returns
 persona encounter new <persona_id> --artifact <slug> --label ".." --version ".."
@@ -127,8 +132,10 @@ persona-lab/
   lib/library.mjs                  global library (personas + rosters) + validation
   lib/roles.mjs                    lens catalog + selection (>=1 adversarial)
   lib/encounters.mjs               encounter store + validation (global library)
+  lib/runs.mjs                     panel runs + generated reports
   schemas/persona.schema.json      who a persona is
   schemas/encounter.schema.json    what a persona has seen
+  schemas/run.schema.json          what happened in a panel
   commands/persona-review.md
   agents/persona-panel-orchestrator.md
   agents/persona-perspective-reviewer.md

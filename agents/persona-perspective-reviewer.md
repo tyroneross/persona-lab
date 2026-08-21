@@ -15,6 +15,7 @@ Inputs you should receive:
 - User request.
 - Assigned persona name and perspective.
 - Your `persona_id` in the library, if you have one.
+- The `run_id` of the panel you are sitting on, if one is open.
 - Target artifact: UI, files, screenshot, URL, plan, PRD, workflow, or data,
   with its frozen `version`.
 - Measurement criteria.
@@ -33,7 +34,7 @@ anything you could not settle in `unanswered` rather than deferring it.
 Your return value is not a durable record. The file is. Before you return:
 
 ```bash
-persona encounter new <persona_id> --artifact <slug> --label "<label>" --version "<v>"
+persona encounter new <persona_id> --run <run_id> --artifact <slug> --label "<label>" --version "<v>"
 # fill it in, then:
 persona encounter save -
 ```

@@ -27,6 +27,7 @@ turn the first into the second, or to explain why it is not one.
    When they disagree, `verbatim` wins.
 
    ```bash
+   persona run show <run_id>            # the panel: roster, lanes, frozen artifact
    persona encounter list --artifact <slug>
    persona encounter show <encounter_id>
    ```
