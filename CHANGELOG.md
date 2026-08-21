@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.4.1
+
+Close the activation gap. `scripts/persona_usage_audit.py` over 1821 transcripts
+found the skill had never been invoked and the agents never dispatched — the
+plugin ships in the RossLabs-AI-Toolkit marketplace but was never enabled. The
+26 sessions that used personas anyway did it by hand, so the demand was never in
+question; the reachability was.
+
+- Skill `description` rewritten against the 11 verbatim requests that should
+  have fired it. Leads with "launch" (the dominant verb, 4 of 11), adds the
+  observed vocabulary — dispatch, debate, interview, stress-test, in parallel,
+  raw reactions separate from synthesis — and carries an explicit anti-trigger
+  so it does not fire on personalization features or a solo UI review.
+- Added skill §5b Debate Rounds. Users ask for personas that argue; the skill
+  forbade cross-visibility. Both hold if they stay ordered: blind independent
+  passes always run first and are saved, then an optional debate pass runs with
+  `blind: false` and `prior_encounters_shown` naming the other personas'
+  positions — never the persona's own history, which produces rationalisation
+  rather than argument.
+- `persona validate` now validates a persona as it will exist after save, so a
+  fresh `persona new` scaffold reports only the 7 fields a human must fill
+  instead of 12 errors including `id`/`created_at`/`updated_at` that saving
+  mints anyway. `--strict` keeps the raw pre-save view.
+- Scenarios must now carry a non-blank title and description. The scaffold
+  shipped `[{title:"",description:""}]` and the validator only counted array
+  length, so every persona created on the happy path saved with a required
+  field that said nothing. All 6 personas in the existing library still
+  validate unchanged.
+
 ## 0.4.0
 
 Persona memory becomes executable. The encounter schema and `docs/persona-memory.md`

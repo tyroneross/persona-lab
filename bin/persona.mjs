@@ -24,7 +24,7 @@ import { readFileSync } from "node:fs";
 import {
   libraryHome, SCHEMA_VERSION,
   listPersonas, getPersona, savePersona, removePersona, archivePersona,
-  searchPersonas, validatePersona, evidenceId,
+  searchPersonas, validatePersona, withSaveDefaults, evidenceId,
   listRosters, getRoster, saveRoster, removeRoster,
 } from "../lib/library.mjs";
 import {
@@ -198,7 +198,14 @@ function cmdSave(positional, flags, { validateOnly }) {
   const personas = Array.isArray(parsed) ? parsed : parsed.personas ? parsed.personas : [parsed];
 
   if (validateOnly) {
-    const results = personas.map((p) => ({ name: p.name || p.id || "(unnamed)", ...validatePersona(p) }));
+    // Validate as the persona will exist AFTER save, unless --strict. Reporting
+    // "id is required" on a scaffold that save would mint is noise that reads
+    // like breakage on a first run.
+    const prep = (p) => {
+      const { lens, _fill, ...clean } = p;
+      return flags.strict ? clean : withSaveDefaults(clean);
+    };
+    const results = personas.map((p) => ({ name: p.name || p.id || "(unnamed)", ...validatePersona(prep(p)) }));
     const ok = results.every((r) => r.ok);
     if (flags.json) out({ ok, results }, true);
     else {
@@ -472,7 +479,7 @@ function usage() {
       "persona — task-specific persona panels + a recallable persona library",
       "",
       '  persona new "<brief>" [--count N] [--roster <name>] [--json]',
-      "  persona save <file|->            persona validate <file|->",
+      "  persona save <file|->            persona validate <file|-> [--strict]",
       "  persona list [--tag t] [--role r] [--status s] [--json]",
       '  persona show <id> [--json]       persona search "<query>" [--json]',
       "  persona rm <id>                  persona archive <id>",

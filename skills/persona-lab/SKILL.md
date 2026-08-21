@@ -1,6 +1,6 @@
 ---
 name: persona-lab
-description: Use when the user asks to spin up personas, test UI through AI user personas, review a product from multiple perspectives, or turn a request into a task-specific persona panel with plan, measurement, launch, and report-back.
+description: Use when the user asks to launch, spin up, or dispatch personas — a persona panel, council, or roster that reviews, debates, interviews, stress-tests, or gives feedback on an artifact and reports back, optionally in parallel and with raw persona reactions kept separate from the synthesis. Not for personalization features or a solo UI review.
 ---
 
 # Persona Lab
@@ -163,6 +163,29 @@ Fallback launch path:
 For UI work, inspect actual files and use browser/screenshot verification when
 the app is available. For strategy, market, regulated, or competitor-sensitive
 work, research current sources before making current-state claims.
+
+### 5b. Debate Rounds (optional, and always second)
+
+Users ask for personas that argue with each other. Independence and debate are
+not in conflict as long as they stay ordered: **blind independent passes always
+run first, and a debate round is a second, separately-recorded pass.** Running
+debate first destroys the only unanchored reaction you will ever get from that
+persona, and it cannot be recovered.
+
+1. Run the independent blind passes. Save each encounter (`blind: true`).
+2. Show each persona only the *positions* it should respond to, named by
+   `encounter_id`, and dispatch a second pass with `blind: false` and
+   `prior_encounters_shown` listing exactly what it saw.
+3. Record the debate pass as its own encounter. Never overwrite the blind one —
+   the schema refuses it, and the pair is the evidence that a position moved.
+4. Report both rounds side by side. A persona that changed its mind under
+   argument is a finding; a persona that changed its mind because it was shown
+   its own prior answer is a rationalisation, which is why step 2 shows other
+   personas' positions and never the persona's own history.
+
+A judge or adjudicator pass (`persona-research-adjudicator`) reads both rounds.
+It does not vote — it verifies claims against the artifact and reports where the
+debate changed a position without changing the evidence.
 
 ### 6. Report Back
 
