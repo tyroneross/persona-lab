@@ -29,6 +29,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 TRANSCRIPT_ROOT = Path.home() / ".claude" / "projects"
+CODEX_ROOTS = [Path.home() / ".codex" / "sessions",
+               Path.home() / ".codex" / "archived_sessions"]
 
 # --- classification --------------------------------------------------------
 
@@ -216,26 +218,116 @@ def scan_file(path, since):
     return events, {"cwd": cwd, "first": ts_first, "last": ts_last, "file": str(path)}
 
 
+# --- Codex ------------------------------------------------------------------
+# Codex rollout JSONL has a different shape than Claude Code's: records are
+# {type: "response_item"|"session_meta", payload: {...}}. Tool calls arrive as
+# payload.type in {function_call, custom_tool_call} with the command inside a
+# JSON-string `arguments` or a free-form `input`. Same two lanes, same rules.
+
+def scan_codex_file(path, since):
+    events = []
+    cwd = None
+    ts_first = ts_last = None
+    inline_panel = False
+    try:
+        with path.open("r", encoding="utf8", errors="replace") as fh:
+            for line in fh:
+                low = line.lower()
+                if "persona" not in low and "councils" not in low:
+                    if ts_first is not None and cwd is not None:
+                        continue
+                try:
+                    rec = json.loads(line)
+                except Exception:
+                    continue
+                ts = rec.get("timestamp")
+                if isinstance(ts, str):
+                    if ts_first is None:
+                        ts_first = ts
+                    ts_last = ts
+                pay = rec.get("payload") or {}
+                if rec.get("type") == "session_meta":
+                    cwd = cwd or pay.get("cwd")
+                    continue
+                if rec.get("type") != "response_item":
+                    continue
+
+                ptype = pay.get("type")
+
+                if ptype in ("message", "agent_message"):
+                    role = pay.get("role") or "assistant"
+                    content = pay.get("content")
+                    if isinstance(content, list):
+                        body = "\n".join(b.get("text", "") for b in content
+                                         if isinstance(b, dict) and b.get("text"))
+                    else:
+                        body = str(content or "")
+                    # Codex has no <system-reminder>; developer role is harness context
+                    if role == "developer":
+                        continue
+                    if role == "user":
+                        m = SLASH_RE.search(body)
+                        if m:
+                            events.append(("plugin", f"command:/persona-lab:{m.group(1)}", ts))
+                        elif ADHOC_BRIEF_RE.search(body) and not META_RE.search(body):
+                            events.append(("adhoc", "codex-user-asked-for-personas", ts))
+                    elif body and mentions_persona(body) and re.search(
+                            r"persona (?:1|one|panel|roster)\b|as the (?:novice|expert|skeptic|recruiter)",
+                            body, re.I):
+                        inline_panel = True
+
+                elif ptype in ("function_call", "custom_tool_call"):
+                    blob = str(pay.get("arguments") or "") + " " + str(pay.get("input") or "")
+                    m = CLI_RE.search(blob)
+                    if m:
+                        events.append(("plugin", f"cli:persona {m.group(1)}", ts))
+                    elif APP_API_RE.search(blob):
+                        events.append(("adhoc", "app-api:councils", ts))
+                    elif ADHOC_BRIEF_RE.search(blob) and not META_RE.search(blob):
+                        events.append(("adhoc", "codex-subagent-briefed-as-persona", ts))
+    except Exception as e:
+        print(f"warn: {path.name}: {e}", file=sys.stderr)
+        return None
+
+    if since and ts_last:
+        try:
+            if datetime.fromisoformat(ts_last.replace("Z", "+00:00")) < since:
+                return None
+        except Exception:
+            pass
+    if inline_panel:
+        events.append(("adhoc", "inline-panel-in-thread", ts_last))
+    if not events:
+        return None
+    return events, {"cwd": cwd, "first": ts_first, "last": ts_last, "file": str(path)}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--days", type=int, default=0, help="only sessions active in the last N days")
     ap.add_argument("--json", help="write full results here")
     ap.add_argument("--root", default=str(TRANSCRIPT_ROOT))
+    ap.add_argument("--no-codex", action="store_true", help="skip Codex sessions")
     args = ap.parse_args()
 
     since = None
     if args.days:
         since = datetime.now(timezone.utc) - timedelta(days=args.days)
 
-    files = sorted(Path(args.root).rglob("*.jsonl"))
+    files = [(f, "claude") for f in sorted(Path(args.root).rglob("*.jsonl"))]
+    if not args.no_codex:
+        for root in CODEX_ROOTS:
+            if root.exists():
+                files += [(f, "codex") for f in sorted(root.rglob("*.jsonl"))]
     lane_counts = Counter()
     label_counts = Counter()
     sessions = {"plugin": set(), "adhoc": set(), "both": set()}
     by_project = defaultdict(lambda: Counter())
     rows = []
 
-    for f in files:
-        got = scan_file(f, since)
+    host_counts = Counter()
+    for f, host in files:
+        got = scan_codex_file(f, since) if host == "codex" else scan_file(f, since)
         if not got:
             continue
         events, meta = got
@@ -243,7 +335,9 @@ def main():
         sid = f.stem
         proj = (meta["cwd"] or f.parent.name).split("/")[-1]
 
+        host_counts[host] += 1
         for lane, label, _ts in events:
+            lane_counts[f"{host}:{lane}"] += 1
             lane_counts[lane] += 1
             label_counts[(lane, label)] += 1
             by_project[proj][lane] += 1
@@ -256,7 +350,7 @@ def main():
             sessions["both"].add(sid)
 
         rows.append({
-            "session": sid, "project": proj, "last": meta["last"],
+            "session": sid, "host": host, "project": proj, "last": meta["last"],
             "plugin": sum(1 for e in events if e[0] == "plugin"),
             "adhoc": sum(1 for e in events if e[0] == "adhoc"),
             "labels": sorted({e[1] for e in events}),
@@ -271,11 +365,17 @@ def main():
     print(f"  ad-hoc only : {len(sessions['adhoc']):>4}   <- the adoption gap")
     print(f"  both        : {len(sessions['both']):>4}")
     print()
+    print("SESSIONS BY HOST")
+    for h, n in host_counts.most_common():
+        print(f"  {h:<8} {n:>4}")
+    print()
     print("EVENTS BY LANE")
     tot = sum(lane_counts.values()) or 1
+    tot = (lane_counts["plugin"] + lane_counts["adhoc"]) or 1
     for lane in ("plugin", "adhoc"):
         n = lane_counts[lane]
-        print(f"  {lane:<8} {n:>5}  ({100*n/tot:.0f}%)")
+        print(f"  {lane:<8} {n:>5}  ({100*n/tot:.0f}%)   "
+              f"claude={lane_counts[f'claude:{lane}']} codex={lane_counts[f'codex:{lane}']}")
     print()
     print("WHAT WAS ACTUALLY CALLED")
     for (lane, label), n in label_counts.most_common(25):
