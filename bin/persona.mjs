@@ -20,7 +20,7 @@
  * Add --json to most commands for machine output.
  */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import {
   libraryHome, SCHEMA_VERSION,
   listPersonas, getPersona, savePersona, removePersona, archivePersona,
@@ -30,6 +30,11 @@ import {
 import {
   scaffoldEncounter, saveEncounter, validateEncounter, listEncounters, getEncounter, encountersDir,
 } from "../lib/encounters.mjs";
+import {
+  createRun, readRun, listRuns, attachEncounter, closeRun, validateRun,
+  runEncounters, writeReport, runDir, runsDir,
+} from "../lib/runs.mjs";
+import { unlinkEncounterRun } from "../lib/encounters.mjs";
 import { ROLE_LIBRARY, DEFAULT_CRITIQUE_LENSES, selectRoles, findRole, isAdversarial } from "../lib/roles.mjs";
 
 // --- arg parsing -----------------------------------------------------------
@@ -386,8 +391,10 @@ function cmdEncounter(positional, flags) {
     if (!flags.artifact) die("--artifact <slug> is required: an encounter is always with a named artifact");
 
     const informed = flags.informed ? String(flags.informed).split(",").map((x) => x.trim()).filter(Boolean) : [];
+    if (flags.run && !readRun(String(flags.run))) die(`run not found: ${flags.run}`);
     const e = scaffoldEncounter({
       persona_id: personaId,
+      run_id: flags.run ? String(flags.run) : undefined,
       artifact: {
         slug: flags.artifact,
         label: flags.label || flags.artifact,
@@ -436,7 +443,26 @@ function cmdEncounter(positional, flags) {
     const saved = [];
     for (const e of items) {
       try {
-        saved.push(saveEncounter(e));
+        const rec = saveEncounter(e);
+        // An encounter that names a run joins that run's lane automatically —
+        // otherwise the link exists only in the direction nobody reads.
+        if (rec.encounter.run_id) {
+          try {
+            attachEncounter(rec.encounter.run_id, rec.encounter.encounter_id,
+              rec.encounter.blind ? "blind" : "debate");
+          } catch (linkErr) {
+            // The work is real and the persona may already be gone, so the
+            // encounter is kept. But it must not be silently absorbed into a
+            // panel that already closed: demote the pointer so the run_id
+            // backlink cannot pull it into that run's report.
+            unlinkEncounterRun(rec.path, linkErr.message);
+            process.stderr.write(
+              `persona: NOT part of ${rec.encounter.run_id} — ${linkErr.message}\n` +
+              `persona: the encounter was kept and its run pointer demoted to unlinked_run_id.\n`
+            );
+          }
+        }
+        saved.push(rec);
       } catch (err) {
         die(`could not save ${e.encounter_id || "(unnamed)"}: ${err.message}`);
       }
@@ -473,6 +499,90 @@ function cmdEncounter(positional, flags) {
   die("usage: persona encounter <new|save|validate|list|show> ...");
 }
 
+// --- runs: a panel as a durable object ------------------------------------
+
+function cmdRun(positional, flags) {
+  const [sub, ...rest] = positional;
+
+  if (sub === "new") {
+    const request = rest.join(" ").trim();
+    if (!request) die('usage: persona run new "<request>" --artifact <slug> [--label ".."] [--version ".."] [--personas id1,id2] [--level low|medium|high]');
+    if (!flags.artifact) die("--artifact <slug> is required");
+    if (!flags.version) die("--version <v> is required — freeze the artifact before a panel sees it");
+    const roster = flags.personas ? String(flags.personas).split(",").map((x) => x.trim()).filter(Boolean) : [];
+    if (!roster.length) die("--personas id1,id2 is required — a run records who was on the panel");
+    for (const id of roster) if (!getPersona(id)) die(`persona not found in the library: ${id}`);
+
+    let run;
+    try {
+      run = createRun({
+        request,
+        artifact: { slug: flags.artifact, label: flags.label || flags.artifact, url: flags.url, version: flags.version, frozen: true },
+        roster,
+        level: flags.level,
+      });
+    } catch (e) {
+      die(e.message);
+    }
+    if (flags.json) return out(run, true);
+    process.stdout.write(`opened ${run.run_id}\n  ${runDir(run.run_id)}\n  ${roster.length} personas on ${run.artifact.label} @ ${run.artifact.version}\n\nEach persona writes its encounter with --run ${run.run_id}\n`);
+    return;
+  }
+
+  if (sub === "list") {
+    const rows = listRuns({ artifact: flags.artifact, status: flags.status });
+    if (flags.json) return out({ count: rows.length, runs: rows }, true);
+    if (!rows.length) return process.stdout.write(`No runs yet.\nStore: ${runsDir()}\n`);
+    for (const r of rows) {
+      const n = (r.lanes || []).reduce((a, l) => a + (l.encounter_ids || []).length, 0);
+      process.stdout.write(
+        `${r.run_id}  [${r.status}]\n  ${r.artifact.label}${r.artifact.version ? ` @ ${r.artifact.version}` : ""} — ${r.started_at.slice(0, 10)}\n` +
+        `  ${(r.roster || []).length} personas, ${n} encounters, ${(r.unanswered || []).length} unanswered\n  ${r.request.slice(0, 90)}\n`
+      );
+    }
+    return;
+  }
+
+  if (sub === "show") {
+    const r = readRun(rest[0]);
+    if (!r) die(`run not found: ${rest[0] || "(none)"}`);
+    if (flags.json) return out({ ...r, encounters: runEncounters(r) }, true);
+    process.stdout.write(`${JSON.stringify(r, null, 2)}\n`);
+    return;
+  }
+
+  if (sub === "report") {
+    const r = readRun(rest[0]);
+    if (!r) die(`run not found: ${rest[0] || "(none)"}`);
+    const file = writeReport(r);
+    if (flags.json) return out({ run_id: r.run_id, report: file }, true);
+    process.stdout.write(`${file}\n`);
+    return;
+  }
+
+  if (sub === "close") {
+    const id = rest[0];
+    if (!id) die("usage: persona run close <run_id> [--synthesis <file|-|text>] [--abandoned]");
+    let synthesis;
+    if (flags.synthesis && flags.synthesis !== true) {
+      const v = String(flags.synthesis);
+      synthesis = (v === "-" || existsSync(v)) ? readInputFile(v === "-" ? undefined : v) : v;
+    }
+    let r;
+    try {
+      r = closeRun(id, { synthesis, status: flags.abandoned ? "abandoned" : "closed" });
+    } catch (e) {
+      die(e.message);
+    }
+    const file = writeReport(r);
+    if (flags.json) return out({ run_id: r.run_id, status: r.status, unanswered: r.unanswered, report: file }, true);
+    process.stdout.write(`${r.status} ${r.run_id}\n  ${file}\n  ${(r.unanswered || []).length} unanswered carried forward\n`);
+    return;
+  }
+
+  die("usage: persona run <new|list|show|report|close> ...");
+}
+
 function usage() {
   process.stdout.write(
     [
@@ -488,6 +598,8 @@ function usage() {
       '  persona panel "<topic>" [--roster <name> | --auto] [--level low|medium|high] [--json]',
       "  persona encounter new <persona_id> --artifact <slug> [--label ..] [--version ..] [--informed ids]",
       "  persona encounter save <file|-> | validate <file|-> | list [<persona_id>] | show <encounter_id>",
+      '  persona run new "<request>" --artifact <slug> --version <v> --personas id1,id2',
+      "  persona run list | show <run_id> | report <run_id> | close <run_id> [--synthesis <file|->]",
       "  persona home",
       "",
       `Library: ${libraryHome()}`,
@@ -514,6 +626,7 @@ function main() {
     case "roster": return cmdRoster(positional, flags);
     case "panel": return cmdPanel(positional, flags);
     case "encounter": return cmdEncounter(positional, flags);
+    case "run": return cmdRun(positional, flags);
     case undefined:
     case "help":
     case "--help":

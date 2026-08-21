@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.5.0
+
+A persona run becomes a durable object. `personas.json` held who a persona is
+and `encounters/` held what one persona saw in one sitting, but the panel itself
+— the roster, the frozen artifact, the lanes in order, what nobody could settle
+— was never a thing you could open afterwards.
+
+```
+~/.persona-lab/runs/<run_id>/run.json    the machine record
+~/.persona-lab/runs/<run_id>/report.md   the readable one, generated
+~/.persona-lab/runs/<run_id>/notes/      anything a human or agent adds
+```
+
+- `persona run new|list|show|report|close`, backed by `lib/runs.mjs` and
+  `schemas/run.schema.json`.
+- History reads both directions. Encounters stay indexed by persona, because a
+  persona's history ACROSS panels is what makes it worth keeping; the run
+  references them by id and each encounter carries `run_id` back. So "everyone
+  on this panel" and "every panel this persona sat on" are both one command.
+- The freeze rule is now enforced where the run is recorded, not only in prose:
+  `run new` refuses to open without `--version`, and the schema pins
+  `artifact.frozen` to true.
+- Lane order is validated. A debate lane cannot precede a blind lane — running
+  debate first destroys the only unanchored reaction the panel will ever get,
+  and it cannot be recovered.
+- `run close` pools every encounter's `unanswered` into the run. That list is
+  the next dispatch's agenda.
+- `report.md` separates verified findings from positions. A preference is not a
+  defect awaiting verification; it is a position that needs a decision. Filing
+  the two together is the conflation the method exists to prevent.
+- A closed run refuses new encounters, and the refusal holds: the encounter is
+  still saved (a persona's verbatim is not discardable) but its pointer is
+  demoted to `unlinked_run_id`, so the backlink cannot pull it into a report for
+  a panel that had already closed.
+
 ## 0.4.1
 
 Close the activation gap. `scripts/persona_usage_audit.py` over 1821 transcripts

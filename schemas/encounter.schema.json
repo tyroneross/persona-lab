@@ -16,7 +16,10 @@
   ],
   "additionalProperties": false,
   "properties": {
-    "schema_version": { "type": "string", "const": "1.0" },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
     "encounter_id": {
       "type": "string",
       "description": "Stable id, convention <persona_id>--<artifact.slug>--<YYYY-MM-DD>--<n>"
@@ -25,111 +28,201 @@
       "type": "string",
       "description": "Foreign key into personas.json. The identity lives there, not here."
     },
-
     "artifact": {
       "type": "object",
-      "required": ["slug", "label"],
+      "required": [
+        "slug",
+        "label"
+      ],
       "additionalProperties": false,
       "properties": {
-        "slug": { "type": "string", "description": "Stable across versions, so encounters can be compared over time" },
-        "label": { "type": "string" },
-        "url": { "type": "string" },
-        "version": { "type": "string", "description": "Commit, build hash, or snapshot name. Required to compare rounds honestly." },
-        "frozen": { "type": "boolean", "description": "True when the artifact was snapshotted so edits could not race the session" }
+        "slug": {
+          "type": "string",
+          "description": "Stable across versions, so encounters can be compared over time"
+        },
+        "label": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "description": "Commit, build hash, or snapshot name. Required to compare rounds honestly."
+        },
+        "frozen": {
+          "type": "boolean",
+          "description": "True when the artifact was snapshotted so edits could not race the session"
+        }
       }
     },
-
-    "started_at": { "type": "string", "format": "date-time" },
-    "ended_at": { "type": "string", "format": "date-time" },
-
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ended_at": {
+      "type": "string",
+      "format": "date-time"
+    },
     "blind": {
       "type": "boolean",
       "description": "True when the persona was given no prior encounter of its own. Blind reads avoid anchoring; informed reads answer whether something improved. Never mix them silently."
     },
     "prior_encounters_shown": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "encounter_ids the persona was allowed to read. Empty when blind."
     },
-
     "conditions": {
       "type": "object",
-      "required": ["viewports"],
+      "required": [
+        "viewports"
+      ],
       "additionalProperties": false,
       "properties": {
         "viewports": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "e.g. 390x844, 1440x900. Findings are meaningless without this."
         },
-        "driver": { "type": "string", "description": "How the artifact was operated, e.g. a real browser session" },
-        "time_budget": { "type": "string", "description": "Stated constraint the persona worked under, e.g. four minutes" }
+        "driver": {
+          "type": "string",
+          "description": "How the artifact was operated, e.g. a real browser session"
+        },
+        "time_budget": {
+          "type": "string",
+          "description": "Stated constraint the persona worked under, e.g. four minutes"
+        }
       }
     },
-
     "verbatim": {
       "type": "string",
       "description": "The persona's unedited report. Never summarise here. Synthesis belongs in a separate file so this stays checkable."
     },
-
     "findings": {
       "type": "array",
       "description": "Structured claims extracted from the verbatim report. Extraction is lossy, so verbatim remains authoritative.",
       "items": {
         "type": "object",
-        "required": ["kind", "claim"],
+        "required": [
+          "kind",
+          "claim"
+        ],
         "additionalProperties": false,
         "properties": {
           "kind": {
             "type": "string",
-            "enum": ["defect", "confusion", "praise", "preference", "request"],
+            "enum": [
+              "defect",
+              "confusion",
+              "praise",
+              "preference",
+              "request"
+            ],
             "description": "A defect is something that does not work. A preference is dislike of something that works. Conflating them is the most common analysis error."
           },
-          "claim": { "type": "string" },
-          "quote": { "type": "string", "description": "The exact phrase, where the persona gave one" },
-          "locus": { "type": "string", "description": "Section, control, or element the finding attaches to" },
-          "viewport": { "type": "string" },
-          "severity": { "type": "string", "enum": ["blocking", "major", "minor", "cosmetic"] },
+          "claim": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string",
+            "description": "The exact phrase, where the persona gave one"
+          },
+          "locus": {
+            "type": "string",
+            "description": "Section, control, or element the finding attaches to"
+          },
+          "viewport": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "blocking",
+              "major",
+              "minor",
+              "cosmetic"
+            ]
+          },
           "verified": {
             "type": "string",
-            "enum": ["unverified", "confirmed", "refuted", "reclassified"],
+            "enum": [
+              "unverified",
+              "confirmed",
+              "refuted",
+              "reclassified"
+            ],
             "description": "Set by a reviewer who checked the claim against the artifact. A reported defect that turns out to be a silent gate is reclassified, not confirmed."
           },
-          "verification_note": { "type": "string" }
+          "verification_note": {
+            "type": "string"
+          }
         }
       }
     },
-
     "decisions": {
       "type": "array",
       "description": "Choices the persona made while working, recorded so a later session can see how it behaved rather than only what it concluded.",
       "items": {
         "type": "object",
-        "required": ["action", "rationale"],
+        "required": [
+          "action",
+          "rationale"
+        ],
         "additionalProperties": false,
         "properties": {
-          "action": { "type": "string" },
-          "rationale": { "type": "string" },
-          "gave_up": { "type": "boolean", "description": "True where the persona abandoned a path. Abandonment is a finding." }
+          "action": {
+            "type": "string"
+          },
+          "rationale": {
+            "type": "string"
+          },
+          "gave_up": {
+            "type": "boolean",
+            "description": "True where the persona abandoned a path. Abandonment is a finding."
+          }
         }
       }
     },
-
     "unanswered": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Questions this encounter raised and could not settle. Ask these up front next time, since a follow-up turn is not reliably available."
     },
-
     "outcome": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "understood_purpose": { "type": "boolean", "description": "Could the persona say what the thing does, in its own words" },
-        "would_recommend": { "type": "boolean" },
-        "score": { "type": "number", "description": "Only where the persona was asked for one. Do not synthesise a score." },
-        "verdict": { "type": "string", "enum": ["succeeds", "partly", "fails"] }
+        "understood_purpose": {
+          "type": "boolean",
+          "description": "Could the persona say what the thing does, in its own words"
+        },
+        "would_recommend": {
+          "type": "boolean"
+        },
+        "score": {
+          "type": "number",
+          "description": "Only where the persona was asked for one. Do not synthesise a score."
+        },
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "succeeds",
+            "partly",
+            "fails"
+          ]
+        }
       }
+    },
+    "run_id": {
+      "type": "string",
+      "description": "The persona run (panel) this encounter belonged to. Lets a run resolve its encounters and a persona resolve every panel it sat on."
     }
   }
 }
