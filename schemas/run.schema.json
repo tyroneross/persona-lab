@@ -2,43 +2,130 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/tyroneross/persona-lab/schemas/run.schema.json",
   "title": "Persona run",
-  "description": "One persona panel as a durable object. personas.json holds who a persona is; encounters/ holds what one persona saw in one sitting; a run holds what happened in the panel — the roster, the frozen artifact, the lanes in order, and what nobody could settle.",
+  "description": "One persona panel as a durable object. personas.json holds who a persona is; encounters/ holds what one persona saw in one sitting; a run holds what happened in the panel \u2014 the roster, the frozen artifact, the lanes in order, and what nobody could settle.",
   "type": "object",
-  "required": ["schema_version", "run_id", "request", "artifact", "roster", "status", "started_at"],
+  "required": [
+    "schema_version",
+    "run_id",
+    "request",
+    "artifact",
+    "roster",
+    "status",
+    "started_at"
+  ],
   "properties": {
-    "schema_version": { "type": "string", "enum": ["1.0.0"] },
-    "run_id": { "type": "string" },
-    "request": { "type": "string", "description": "One sentence on what the panel was asked to judge." },
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "1.0.0"
+      ]
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "request": {
+      "type": "string",
+      "description": "One sentence on what the panel was asked to judge."
+    },
     "artifact": {
       "type": "object",
-      "required": ["slug", "label", "frozen"],
+      "required": [
+        "slug",
+        "label",
+        "frozen"
+      ],
       "properties": {
-        "slug": { "type": "string" },
-        "label": { "type": "string" },
-        "url": { "type": "string" },
-        "version": { "type": "string" },
-        "frozen": { "type": "boolean", "const": true, "description": "Always true. A panel that races builder edits produces findings about something that never existed." }
+        "slug": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "frozen": {
+          "type": "boolean",
+          "const": true,
+          "description": "Always true. A panel that races builder edits produces findings about something that never existed."
+        },
+        "project": {
+          "type": "string",
+          "description": "Project or category this artifact belongs to. Lets a persona with recall scope \"project\" carry context across artifacts in the same ongoing effort."
+        }
       }
     },
-    "roster": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "persona_ids on the panel." },
-    "level": { "type": "string", "enum": ["low", "medium", "high"] },
+    "roster": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      },
+      "description": "persona_ids on the panel."
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
     "lanes": {
       "type": "array",
       "description": "Passes in the order they ran. A debate lane may never precede a blind lane.",
       "items": {
         "type": "object",
-        "required": ["kind"],
+        "required": [
+          "kind"
+        ],
         "properties": {
-          "kind": { "type": "string", "enum": ["blind", "debate", "adjudication"] },
-          "encounter_ids": { "type": "array", "items": { "type": "string" } }
+          "kind": {
+            "type": "string",
+            "enum": [
+              "blind",
+              "debate",
+              "adjudication"
+            ]
+          },
+          "encounter_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
         }
       }
     },
-    "synthesis": { "type": "string" },
-    "unanswered": { "type": "array", "items": { "type": "string" }, "description": "Pooled from every encounter at close. This is the next dispatch's agenda, because there is no second turn." },
-    "status": { "type": "string", "enum": ["open", "closed", "abandoned"] },
-    "started_at": { "type": "string" },
-    "ended_at": { "type": "string" },
-    "notes": { "type": "string" }
+    "synthesis": {
+      "type": "string"
+    },
+    "unanswered": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Pooled from every encounter at close. This is the next dispatch's agenda, because there is no second turn."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "closed",
+        "abandoned"
+      ]
+    },
+    "started_at": {
+      "type": "string"
+    },
+    "ended_at": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
   }
 }

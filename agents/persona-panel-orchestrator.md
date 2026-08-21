@@ -39,6 +39,12 @@ Operate in this order:
    get to ask. Before you dispatch, read the brief once more and add whatever
    you would otherwise plan to ask in a second turn.
 
+   **Respect each persona's recall scope.** It is a property of the role, not a
+   choice per dispatch. Run `persona recall <persona_id> --artifact <slug>
+   [--project <name>]` to get exactly what a persona may bring; a `none` persona
+   returns nothing and must be dispatched blind. The CLI refuses an out-of-scope
+   briefing rather than warning about it.
+
    **Run blind by default**, and state it. A blind read asks "does this work".
    An informed read asks "is this better than before" and must name the exact
    `encounter_id`s the persona was shown. Never mix them silently: a persona

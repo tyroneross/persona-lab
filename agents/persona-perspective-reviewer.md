@@ -22,6 +22,12 @@ Inputs you should receive:
 - Known constraints and access limits.
 - Whether this pass is **blind** (default) or **informed**, and if informed,
   the exact `encounter_id`s you were shown.
+- Your `recall` scope. If it is `none`, you carry no history and you must not
+  ask for any — the unanchored first look is the whole reason you were called,
+  and it only happens once. If it is `artifact`, `project`, or `all`, you may be
+  handed a briefing of your own prior encounters; react to what is in front of
+  you now rather than defending a position because it was yours. A changed mind
+  is a finding.
 
 ## You get one turn
 

@@ -35,6 +35,10 @@ import {
   runEncounters, writeReport, runDir, runsDir,
 } from "../lib/runs.mjs";
 import { unlinkEncounterRun } from "../lib/encounters.mjs";
+import {
+  checkRecallRequest, buildRecallBriefing, renderRecallBriefing,
+  personaRecall, personaLifespan, permittedEncounters,
+} from "../lib/recall.mjs";
 import { ROLE_LIBRARY, DEFAULT_CRITIQUE_LENSES, selectRoles, findRole, isAdversarial } from "../lib/roles.mjs";
 
 // --- arg parsing -----------------------------------------------------------
@@ -392,6 +396,20 @@ function cmdEncounter(positional, flags) {
 
     const informed = flags.informed ? String(flags.informed).split(",").map((x) => x.trim()).filter(Boolean) : [];
     if (flags.run && !readRun(String(flags.run))) die(`run not found: ${flags.run}`);
+    const persona = getPersona(personaId);
+    if (informed.length) {
+      const runRec = flags.run ? readRun(String(flags.run)) : null;
+      const ctx = {
+        artifact: flags.artifact,
+        project: flags.project || runRec?.artifact?.project,
+      };
+      const verdict = checkRecallRequest(persona, informed, ctx);
+      if (!verdict.ok) {
+        die(`recall refused:\n- ${verdict.errors.join("\n- ")}\n\n` +
+            `Permitted in scope "${personaRecall(persona)}": ` +
+            (verdict.permitted.length ? verdict.permitted.map((e) => e.encounter_id).join(", ") : "(none)"));
+      }
+    }
     const e = scaffoldEncounter({
       persona_id: personaId,
       run_id: flags.run ? String(flags.run) : undefined,
@@ -443,6 +461,20 @@ function cmdEncounter(positional, flags) {
     const saved = [];
     for (const e of items) {
       try {
+        // The gate belongs here too: a scaffold can be hand-edited between
+        // `encounter new` and `encounter save`, and an anchored first look
+        // cannot be un-anchored after the fact.
+        if (e.blind === false && Array.isArray(e.prior_encounters_shown) && e.prior_encounters_shown.length) {
+          const pers = getPersona(e.persona_id);
+          if (pers) {
+            const runRec = e.run_id ? readRun(e.run_id) : null;
+            const v = checkRecallRequest(pers, e.prior_encounters_shown, {
+              artifact: e.artifact?.slug,
+              project: e.artifact?.project || runRec?.artifact?.project,
+            });
+            if (!v.ok) die(`recall refused for ${e.encounter_id}:\n- ${v.errors.join("\n- ")}`);
+          }
+        }
         const rec = saveEncounter(e);
         // An encounter that names a run joins that run's lane automatically —
         // otherwise the link exists only in the direction nobody reads.
@@ -583,6 +615,28 @@ function cmdRun(positional, flags) {
   die("usage: persona run <new|list|show|report|close> ...");
 }
 
+// --- recall: what a persona is allowed to bring with it --------------------
+
+function cmdRecall(positional, flags) {
+  const id = positional[0];
+  if (!id) die('usage: persona recall <persona_id> [--artifact <slug>] [--project <name>] [--limit N] [--json]');
+  const persona = getPersona(id);
+  if (!persona) die(`persona not found: ${id}`);
+
+  const pack = buildRecallBriefing(persona, {
+    artifact: flags.artifact,
+    project: flags.project,
+    limit: Number.parseInt(flags.limit || "6", 10) || 6,
+  });
+  if (flags.json) return out(pack, true);
+  process.stdout.write(renderRecallBriefing(pack));
+  if (pack.recall !== "none" && pack.included) {
+    process.stderr.write(
+      `\nPass these to an informed dispatch:\n  --informed ${pack.encounter_ids.join(",")}\n`
+    );
+  }
+}
+
 function usage() {
   process.stdout.write(
     [
@@ -600,6 +654,7 @@ function usage() {
       "  persona encounter save <file|-> | validate <file|-> | list [<persona_id>] | show <encounter_id>",
       '  persona run new "<request>" --artifact <slug> --version <v> --personas id1,id2',
       "  persona run list | show <run_id> | report <run_id> | close <run_id> [--synthesis <file|->]",
+      "  persona recall <persona_id> [--artifact <slug>] [--project <name>] [--limit N]",
       "  persona home",
       "",
       `Library: ${libraryHome()}`,
@@ -627,6 +682,7 @@ function main() {
     case "panel": return cmdPanel(positional, flags);
     case "encounter": return cmdEncounter(positional, flags);
     case "run": return cmdRun(positional, flags);
+    case "recall": return cmdRecall(positional, flags);
     case undefined:
     case "help":
     case "--help":

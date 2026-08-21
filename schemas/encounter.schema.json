@@ -53,6 +53,10 @@
         "frozen": {
           "type": "boolean",
           "description": "True when the artifact was snapshotted so edits could not race the session"
+        },
+        "project": {
+          "type": "string",
+          "description": "Project or category this artifact belongs to. Lets a persona with recall scope \"project\" carry context across artifacts in the same ongoing effort."
         }
       }
     },

@@ -69,6 +69,9 @@ persona panel --roster "Enterprise rollout review" --level high
 
 persona home        # print the library path
 
+# what a persona may bring with it (scoped by its role, not your mood)
+persona recall <persona_id> [--artifact <slug>] [--project <name>]
+
 # a panel as a durable object you can open months later
 persona run new "<question>" --artifact <slug> --version <v> --personas id1,id2
 persona run list | show <run_id> | report <run_id> | close <run_id> [--synthesis <file|->]
@@ -133,6 +136,7 @@ persona-lab/
   lib/roles.mjs                    lens catalog + selection (>=1 adversarial)
   lib/encounters.mjs               encounter store + validation (global library)
   lib/runs.mjs                     panel runs + generated reports
+  lib/recall.mjs                   lifespan + recall scope: what a persona brings
   schemas/persona.schema.json      who a persona is
   schemas/encounter.schema.json    what a persona has seen
   schemas/run.schema.json          what happened in a panel

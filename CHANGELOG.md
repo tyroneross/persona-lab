@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.6.0
+
+Temporary and persistent personas, and a recall scope that decides what a
+persona is allowed to bring with it.
+
+Two orthogonal properties on a persona:
+
+- `lifespan` — `persistent` (lives in the library, accumulates history) or
+  `temporary` (one run only).
+- `recall` — `none` | `artifact` | `project` | `all`. How much of its OWN
+  history it may READ when dispatched.
+
+The split exists because some personas' value is cumulative and some is
+non-renewable. An architect who forgets prior assessments is a worse architect;
+accumulated judgment is the reason to keep it. A first-run user who remembers is
+no longer a first-run user, and that loss cannot be undone. You can always give
+a persona context; you can never give it back its first look. So `none` is the
+default: wrongly-fresh is recoverable, wrongly-anchored is not.
+
+- `recall` defaults per lens in the role catalog, because it is a property of the
+  role rather than a dispatcher's mood — novice `none`, UX researcher `artifact`
+  (fresh on a new problem, continuous on an ongoing one), buyer/design/PM
+  `project`, architect/security/domain/red-team `all`.
+- `persona recall <id> [--artifact <slug>] [--project <name>]` prints exactly
+  what a persona may bring, plus the `--informed` line to pass into the dispatch.
+  Verbatim is reproduced unedited — a summarised memory is one the persona
+  rationalises from rather than recalls.
+- The gate is enforced at both seams (`encounter new --informed` and
+  `encounter save`): a `recall: none` persona cannot be shown prior encounters,
+  and no persona can be shown one outside its scope.
+- The two refusals are diagnosed separately. Another persona's transcript is not
+  a narrow scope — it is a debate round, and belongs in a debate lane.
+- `artifact.project` added to the encounter and run schemas so `project` scope
+  has a grouping above the artifact slug.
+- A temporary persona cannot have `project` or `all` recall — it has no history
+  outside its run.
+- Writing is never gated; only reading. A `none` persona still records
+  everything, because the analyst needs the transcript the persona may not read.
+
 ## 0.5.0
 
 A persona run becomes a durable object. `personas.json` held who a persona is

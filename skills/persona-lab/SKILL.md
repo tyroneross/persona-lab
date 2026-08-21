@@ -241,6 +241,55 @@ the method produces reactions from simulated participants, not task-success or
 timing data from recruited users under observation. That distinction limits
 every claim the panel can make.
 
+## Temporary and Persistent Personas
+
+Two properties decide what a persona *is*, and they are orthogonal.
+
+**`lifespan`** — does it outlive the run?
+
+- `persistent` — lives in the library, reusable across projects, accumulates a
+  history. The default.
+- `temporary` — exists for this run only. Use it when the perspective is
+  specific to one situation and would be noise in the library.
+
+**`recall`** — how much of its own history may it *read* when dispatched?
+
+| scope | brings | right for |
+|---|---|---|
+| `none` | nothing, ever | novice, first-run user — the unanchored first look |
+| `artifact` | prior encounters with this same artifact | UX researcher on an ongoing problem |
+| `project` | encounters across artifacts in the same project or category | buyer, designer, PM, content |
+| `all` | everything it has seen | architect, security, domain expert, red-team |
+
+The reason these are separate: **some personas' value is cumulative and some is
+non-renewable.** An architect who forgets prior assessments is a worse architect
+— accumulated judgment is the entire reason to keep it. A first-run user who
+remembers is no longer a first-run user, and unlike the architect's, that loss
+cannot be undone. You can always give a persona context. You can never give it
+back its first look.
+
+So `none` is the default, and `recall` is a property of the **role**, not a
+dispatcher's mood. The lens catalog carries a default per lens.
+
+```bash
+persona recall <persona_id> [--artifact <slug>] [--project <name>]
+#   prints exactly what this persona is permitted to bring, and the
+#   --informed id,id line to pass into the dispatch. Empty for `none`.
+```
+
+**Writing is never gated; only reading is.** Every persona records what it saw,
+including a `none` persona — the analyst needs that transcript even though the
+persona may never read it back.
+
+The gate is enforced, not advised: dispatching a `recall: none` persona with
+prior encounters is refused, and so is showing any persona an encounter outside
+its scope. Handing a persona *another* persona's position is a different act
+entirely — that is a debate round, and it belongs in a debate lane after the
+blind passes are saved (§5b).
+
+If you need a knowledgeable version of a fresh persona, that is a **different
+persona**, not the same one with a flag flipped.
+
 ## Run Memory
 
 A panel is a durable object, not a conversation that ends. Open a run before the

@@ -28,7 +28,10 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "enum": ["1.0.0", "1.1.0"]
+      "enum": [
+        "1.0.0",
+        "1.1.0"
+      ]
     },
     "id": {
       "type": "string",
@@ -36,7 +39,11 @@
     },
     "status": {
       "type": "string",
-      "enum": ["draft", "active", "archived"]
+      "enum": [
+        "draft",
+        "active",
+        "archived"
+      ]
     },
     "name": {
       "$ref": "#/$defs/non_empty_string"
@@ -70,7 +77,12 @@
     },
     "provenance": {
       "type": "string",
-      "enum": ["proto", "qualitative", "synthetic-grounded", "synthetic-assumed"],
+      "enum": [
+        "proto",
+        "qualitative",
+        "synthetic-grounded",
+        "synthetic-assumed"
+      ],
       "description": "Basis for this persona: proto (team assumptions), qualitative (interviews), synthetic-grounded (LLM grounded in real data), synthetic-assumed (LLM assumption, hypothesis only)."
     },
     "frustrations": {
@@ -127,11 +139,20 @@
     },
     "tech_comfort": {
       "type": "string",
-      "enum": ["low", "medium", "high"]
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
     },
     "decision_style": {
       "type": "string",
-      "enum": ["fast", "deliberate", "consensus", "authority-led"]
+      "enum": [
+        "fast",
+        "deliberate",
+        "consensus",
+        "authority-led"
+      ]
     },
     "notes": {
       "type": "string",
@@ -142,6 +163,26 @@
     },
     "updated_at": {
       "$ref": "#/$defs/iso_datetime"
+    },
+    "lifespan": {
+      "type": "string",
+      "enum": [
+        "persistent",
+        "temporary"
+      ],
+      "default": "persistent",
+      "description": "persistent \u2014 lives in the library, reusable, accumulates history. temporary \u2014 exists for one run only, stored in that run's folder and never added to personas.json."
+    },
+    "recall": {
+      "type": "string",
+      "enum": [
+        "none",
+        "artifact",
+        "project",
+        "all"
+      ],
+      "default": "none",
+      "description": "How much of its OWN history this persona may READ when dispatched. none = always fresh (a first impression is non-renewable). artifact = only prior encounters with the same artifact, i.e. the same problem still ongoing. project = across artifacts in the same project or category. all = everything. Writing is never gated by this; only reading."
     }
   },
   "$defs": {
@@ -168,7 +209,10 @@
     "scenario": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["title", "description"],
+      "required": [
+        "title",
+        "description"
+      ],
       "properties": {
         "title": {
           "$ref": "#/$defs/non_empty_string"
@@ -183,7 +227,12 @@
     "evidence_item": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "source_type", "summary", "confidence"],
+      "required": [
+        "id",
+        "source_type",
+        "summary",
+        "confidence"
+      ],
       "properties": {
         "id": {
           "type": "string",
