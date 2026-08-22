@@ -1,3 +1,9 @@
 node_modules/
 .DS_Store
 *.log
+
+# Study internals belonging to other projects. Archived to build-loop-memory
+# (atomize-ai + ross-labs-astro lanes). This repo is public; they are not.
+encounters/**/engine/
+encounters/**/rosslabs-integration-plan.md
+.build-loop/
