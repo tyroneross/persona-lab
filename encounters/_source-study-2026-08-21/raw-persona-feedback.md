@@ -40,7 +40,7 @@ not for someone deciding whether to put him in front of a client.
 **5. Phone-specific frustration.** I tapped "FEED ONE ARTICLE" and "RUN A QUERY" and nothing visibly
 happened on my screen. The counters that changed were several scrolls away, so it felt broken until I
 scrolled up. The top nav tab is cut off on phone, it reads "BLU" instead of "BLUEPRINTS." And in the
-levers section, source text like "prisma/migrations/20251013000653_upgrade_to_hnsw_inde..." runs off
+levers section, source text like "[redacted: internal migration path]..." runs off
 the right edge of the screen, clipped. Also, the same sentence, "Closing this valve seals the hopper.
 No new articles fall from it until you open it again," repeats five times back to back. That's a lot
 of scrolling for one idea.
@@ -148,7 +148,7 @@ quote, and you can turn switches on and off to see what breaks." I could not tel
 actually FOR, who would use it, or why I'd want it.
 
 **2. First thing that confused me.** "PIPELINE UNIT 01, A WORKING SCALE MODEL" right under the title,
-before I even knew what "it" was. Close second, a few seconds later: "CONTENT_QUALITY_FLOOR" printed
+before I even knew what "it" was. Close second, a few seconds later: "[redacted: internal config key]" printed
 as a raw code variable name directly under a plain-English toggle called "Quality Floor." I don't know
 what that string means or why I'm being shown it.
 

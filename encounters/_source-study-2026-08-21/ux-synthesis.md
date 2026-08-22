@@ -2,7 +2,7 @@
 
 Study object: `eval-snapshot.html`, six participants, phone (390x844) and desktop (1440x900).
 Researcher observation conducted independently on 2026-08-21 against the live page at
-`http://127.0.0.1:8800/eval-snapshot.html`, plus a source read of the served HTML.
+`[local snapshot: eval-snapshot.html]`, plus a source read of the served HTML.
 
 ---
 
@@ -95,7 +95,7 @@ and P6 reported that the second view contains the legend that made the whole pag
 clipped label on the control leading to your best explanatory asset is worse than it looks.
 
 **D4. Long source paths and the pipeline diagram clip horizontally on phone. Severity: medium.**
-P1: source text like "prisma/migrations/20251013000653_upgrade_to_hnsw_inde..." runs off the right
+P1: source text like "[redacted: internal migration path]..." runs off the right
 edge. P6 independently reported "the pipeline diagram up top got cut off sideways so I couldn't see
 the whole Acquire to Surface flow at once." Two participants, two different elements, same root
 cause. I confirmed the narrow-viewport layout but did not measure each clipped element individually,
@@ -182,7 +182,7 @@ measured" render in one continuous panel with no separation. The page's own hone
 makes this dangerous: a visitor who has learned to trust the badges may read the panel as validated.
 
 **DP8. Raw environment variable names sit under plain-English labels. One participant. Severity: low.**
-P4: "CONTENT_QUALITY_FLOOR printed as a raw code variable name directly under a plain-English toggle
+P4: "[redacted: internal config key] printed as a raw code variable name directly under a plain-English toggle
 called Quality Floor. I don't know what that string means or why I'm being shown it." Confirmed on
 screen. For the expert audience these strings are the page's proof of realism, so this one is a
 genuine dual-audience cost rather than a simple error.

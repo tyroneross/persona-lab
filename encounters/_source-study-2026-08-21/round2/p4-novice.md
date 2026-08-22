@@ -28,7 +28,7 @@ I'm listing all of these even though some of them "sound like everyday words" �
 - "hoppers" (I only understand this as a factory grain funnel; not sure what it means for news)
 - "quality gate"
 - "reason code" ("every rejection carries the system's real reason code")
-- "CONTENT_QUALITY_FLOOR" and all the other ALL_CAPS_WITH_UNDERSCORES labels next to each control
+- "[redacted: internal config key]" and all the other ALL_CAPS_WITH_UNDERSCORES labels next to each control
 - "ENFORCE_CONTENT_QUALITY_GATE"
 - "downstream AI spend" (money? which AI? spending on what?)
 - "intake rate"
@@ -48,7 +48,7 @@ I'm listing all of these even though some of them "sound like everyday words" �
 - "RAGAS run," "gold set," "curated gold set"
 - "HNSW" and "IVFFlat" ("Roll back HNSW to IVFFlat")
 - "P95 latency," "recall drops below 90%"
-- "prisma/migrations/20251013000653_upgrade_to_hnsw_index/rollback.sql" — this is a raw file path shown on the page, I have no idea what to do with this
+- "[redacted: internal migration path]/rollback.sql" — this is a raw file path shown on the page, I have no idea what to do with this
 - "Chunk sizing, 800 target tokens, 100 overlap, 1000 hard max"
 - "tokens" (used several times, never explained)
 - "openai/gpt-oss-20b" — looks like a code name for something, maybe an AI model?
@@ -85,7 +85,7 @@ Verdict: This one partly helped — I now understand the BASIC idea (it only kee
 
 Almost everywhere past the first two paragraphs. Specifically:
 
-- The moment I hit the "PLANT CONTROLS" panel with sliders labeled "CONTENT_QUALITY_FLOOR" — that's clearly a programmer's internal setting name shown directly to me with no translation.
+- The moment I hit the "PLANT CONTROLS" panel with sliders labeled "[redacted: internal config key]" — that's clearly a programmer's internal setting name shown directly to me with no translation.
 - The "WHAT-IF LEVERS" panel, which is full of settings like "Grounding strictness," "Edge strength floor," "Search Orchestrator V2 (real RRF fusion)," "spaCy direction check," "Roll back HNSW to IVFFlat" — I don't know what any of these DO to the news I'd actually read, only that turning them on/off does something to numbers I also don't understand (ms, P95, recall).
 - The bottom of the FLOOR page ("EVERY PART OF THIS TOY HAS A REAL COUNTERPART IN PRODUCTION") calls the whole thing "this toy" — after being told it's "a working scale model." I don't know anymore if I'm playing with a toy, a demo, or something real that affects a real product.
 - The BLUEPRINTS tab is worse — it opens with a legend of six badge types (MEASURED, REASONED, INFERRED, DEFAULT, BUILT NOT WIRED, NO RECORD) I have to memorize before reading anything else, then immediately shows "GATE 02 · Quote-Grounding Gate" with text like "Entity extraction runs per KG block on openai/gpt-oss-20b." I felt like I'd wandered into an engineering document that was never meant for a visitor.
@@ -102,9 +102,9 @@ Yes, three times:
 ## 7. Anything broken, overlapping, cut off, or unreadable?
 
 - **At mobile width (390px):** The two side-by-side panels ("PLANT CONTROLS" and "WHAT-IF LEVERS") do NOT stack into one column — they stay side-by-side and get squeezed narrow. The right-hand "WHAT-IF LEVERS" column becomes noticeably cramped compared to how it reads on desktop. Nothing is technically cut off, but it's clearly not been redesigned for a phone screen — it's a shrunk desktop layout.
-- **Raw code artifacts left on screen at any width**, not a rendering bug exactly, but they read as broken to me: a full file path (prisma/migrations/20251013000653_upgrade_to_hnsw_index/rollback.sql) and a model name (openai/gpt-oss-20b) are printed directly on the page like normal sentences. That looks like something a developer forgot to clean up before showing it to a visitor.
+- **Raw code artifacts left on screen at any width**, not a rendering bug exactly, but they read as broken to me: a full file path ([redacted: internal migration path]/rollback.sql) and a model name (openai/gpt-oss-20b) are printed directly on the page like normal sentences. That looks like something a developer forgot to clean up before showing it to a visitor.
 - **The server itself timed out on my very first attempt to open the page** ("This site can't be reached... ERR_TIMED_OUT"). I had to try again before it loaded — I'm noting it here even though it's not the page's design, in case it happens to other reviewers too.
 
 ## 8. The one change that would help me most
 
-**Give me a one-sentence, plain-English translation next to every single control and badge, written for someone who has never coded — not a tooltip I have to hunt for and hover, and not a second wall of jargon when I do.** Right now almost every label on this page (CONTENT_QUALITY_FLOOR, ENFORCE_CONTENT_QUALITY_GATE, RRF fusion, HNSW/IVFFlat, spaCy, P95, tokens, KG block, adjacency list, gold set...) is either an internal code name or a term from a field I've never studied, and the two tooltips I did find just introduced more jargon on top of jargon. If I can't tell what a control DOES to the news I'd read, in words I already know, I can't use this page at all — I can only click things and watch for a reaction I don't understand.
+**Give me a one-sentence, plain-English translation next to every single control and badge, written for someone who has never coded — not a tooltip I have to hunt for and hover, and not a second wall of jargon when I do.** Right now almost every label on this page ([redacted: internal config key], ENFORCE_CONTENT_QUALITY_GATE, RRF fusion, HNSW/IVFFlat, spaCy, P95, tokens, KG block, adjacency list, gold set...) is either an internal code name or a term from a field I've never studied, and the two tooltips I did find just introduced more jargon on top of jargon. If I can't tell what a control DOES to the news I'd read, in words I already know, I can't use this page at all — I can only click things and watch for a reaction I don't understand.

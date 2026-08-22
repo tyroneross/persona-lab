@@ -2,7 +2,7 @@
 
 Reviewer: P1 (technical recruiter, AI/data eng screens). Not an engineer — I judge whether this reads as a real system built by someone who'd pass a bar-raiser loop, or a portfolio toy dressed up with jargon.
 
-Page: http://127.0.0.1:8777/eval-snapshot.html. Reviewed FLOOR and BLUEPRINTS tabs, desktop (1440px) and mobile (390px), with live interaction (toggles, buttons, a query run, a 24h simulation, node inspection, tab switches).
+Page: [local snapshot: eval-snapshot.html.] Reviewed FLOOR and BLUEPRINTS tabs, desktop (1440px) and mobile (390px), with live interaction (toggles, buttons, a query run, a 24h simulation, node inspection, tab switches).
 
 ---
 

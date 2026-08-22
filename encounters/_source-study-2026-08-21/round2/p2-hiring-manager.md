@@ -1,6 +1,6 @@
 # P2 — Strategy Hiring Manager Review: Atomize AI "Fact Refinery" snapshot
 
-Reviewed at `http://127.0.0.1:8777/eval-snapshot.html`, desktop (1920px) and mobile (390px), FLOOR and BLUEPRINTS tabs. Verified with IBR `screenshot`, `scan`, `observe`, `interact`, and `interact_and_verify` (persistent `session_start` refused to connect on this instance — noted below as a tooling limitation, not held against the page).
+Reviewed at `[local snapshot: eval-snapshot.html]`, desktop (1920px) and mobile (390px), FLOOR and BLUEPRINTS tabs. Verified with IBR `screenshot`, `scan`, `observe`, `interact`, and `interact_and_verify` (persistent `session_start` refused to connect on this instance — noted below as a tooling limitation, not held against the page).
 
 ---
 

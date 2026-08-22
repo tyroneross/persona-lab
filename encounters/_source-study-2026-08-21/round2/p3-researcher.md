@@ -1,7 +1,7 @@
 # P3 — Peer review: "The Fact Refinery" (Atomize AI eval snapshot)
 
 **Reviewer:** P3, retrieval + knowledge-graph researcher
-**Artifact:** `http://127.0.0.1:8777/eval-snapshot.html`, frozen snapshot, 316,383 bytes
+**Artifact:** `[local snapshot: eval-snapshot.html]`, frozen snapshot, 316,383 bytes
 **Method:** IBR (screenshot / session / scan) at desktop 1920, 1440 and mobile 390; plus a byte-identical
 local mirror of the served file so I could read the shipped `window.M`, `window.G`, `DECK_*` and the
 provenance-assignment function directly rather than paraphrasing what the page rendered.

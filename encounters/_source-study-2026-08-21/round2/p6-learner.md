@@ -1,6 +1,6 @@
 # P6 — AI-native learner review of eval-snapshot.html ("The Fact Refinery")
 
-Tested at http://127.0.0.1:8777/eval-snapshot.html via IBR (session_start/session_action/screenshot/observe/scan). Desktop viewport 1440x900 unless noted; mobile viewport 390x844. Server had to be restarted mid-review (see §6) — noting that up front because it colors how much I trust the rest of the infra.
+Tested at [local snapshot: eval-snapshot.html] via IBR (session_start/session_action/screenshot/observe/scan). Desktop viewport 1440x900 unless noted; mobile viewport 390x844. Server had to be restarted mid-review (see §6) — noting that up front because it colors how much I trust the rest of the infra.
 
 ## 1. What I actually learned (new to me, with the number/mechanism)
 
