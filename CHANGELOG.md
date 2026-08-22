@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.7.2
+
+A lint for the rule 0.7.1 could only state.
+
+- `scripts/provenance_lint.py` has two arms. TABLE checks that every row of the
+  provenance table has a valid status and an evidence path that resolves on
+  disk — deterministic, and safe to make blocking. DIFF flags normative claims
+  ADDED by a change set when the provenance table was not touched in the same
+  change, so a claim and its standing arrive together.
+- Diff-scoped deliberately: re-scanning settled prose every commit produces
+  noise nobody reads.
+- **Precision was measured before deciding what the gate may do**, at roughly
+  40-55% hand-judged over the last 19 commits. Two rounds of tightening moved it
+  from ~40% to ~50% and then stalled, so it is WARN-only permanently rather than
+  provisionally. The residual false positives are not separable by this approach:
+  "A debate lane cannot precede a blind lane" (doctrine) and "`verbatim` is never
+  discarded" (a description of implemented behavior) are the same sentence shape,
+  and the text does not carry which one it is.
+- That precision figure is itself a row in the provenance table, marked
+  `measured`, with the sample size stated. The lint is subject to its own rule.
+- `scripts/test_provenance_lint.py` pins the table arm and the exemption classes.
+  It caught a real gap on its first run — the disclosure phrasing "nothing has
+  been calibrated" was being flagged as an unbacked claim, inverting the point.
+
 ## 0.7.1
 
 Say plainly what this method has not earned.

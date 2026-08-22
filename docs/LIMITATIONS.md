@@ -16,15 +16,37 @@ not as evidence that the opinion is correct.
 
 ## Provenance of every load-bearing claim
 
-| Claim | What is actually behind it |
-|---|---|
-| Encounter memory, the blind/informed split, the adjudicator role, "ask everything in the first dispatch", "freeze the artifact" | **One study.** Six personas, one artifact (The Fact Refinery), one day, 2026-08-21. Raw material in `encounters/_source-study-2026-08-21/`, ~1,400 lines. No replication, not blind, effort and model unpinned. |
-| Subagent eviction at ~30s | Observed once in that study; the `pbe = 30000` constant was read out of a Claude Code binary that has since changed versions. **Not re-verified.** If this number is wrong the encounter-before-return rule loses its main justification (though it stays defensible on durability grounds alone). |
-| Persona-lab usage: 22 plugin events vs 335 ad-hoc across 4,781 transcripts | **Measured.** `scripts/persona_usage_audit.py`, both hosts. The strongest evidence in the repo — and it measures adoption, not whether the method works. |
-| Recall scope defaults across the 16 lenses (novice `none`, architect `all`, …) | **Asserted.** Assigned by reasoning about which roles have cumulative versus non-renewable value. Zero evidence that an `all`-scope architect produces better review than a `none`-scope one. |
-| `none` as the global default | **Asserted**, from an asymmetry argument: wrongly-fresh is recoverable, wrongly-anchored is not. The argument is sound; the premise that anchoring meaningfully degrades a persona review here has not been tested. |
-| "Panels are for spread, not consensus" | Single study, plus one earlier 10-persona audit (`lenny-podcast-transcripts`, 2026-08-07) that reached the same conclusion. Two observations, same author, same year. |
-| Required adversarial lens counters LLM positivity bias | Borrowed from published concern about model sycophancy. **Never tested in this system.** No run has been compared with and without it. |
+Each row carries a machine-checkable status. `scripts/provenance_lint.py` parses
+this table, so keep the shape: `| claim | status | evidence |` where status is
+one of `measured`, `single-study`, `borrowed`, `asserted`, and evidence is a
+path, a script, or `none`.
+
+| Claim | Status | Evidence |
+|---|---|---|
+| Encounter memory, blind/informed split, adjudicator role, ask-everything-first, freeze-the-artifact | single-study | encounters/_source-study-2026-08-21/ |
+| Subagent eviction at ~30 seconds | asserted | none |
+| Persona-lab adoption: 22 plugin vs 335 ad-hoc events across 4,781 transcripts | measured | scripts/persona_usage_audit.py |
+| Recall scope defaults across the 16 lenses | asserted | none |
+| `none` as the global recall default | asserted | none |
+| Panels are for spread, not consensus | single-study | encounters/_source-study-2026-08-21/ |
+| A required adversarial lens counters LLM positivity bias | borrowed | none |
+| Panel size of 3-6 lenses | asserted | none |
+| Blind passes must precede a debate round | asserted | none |
+| A preference and a defect need different handling | single-study | encounters/_source-study-2026-08-21/ |
+| provenance-lint catches new unbacked claims at ~40-55% precision | measured | scripts/provenance_lint.py |
+
+Notes the table cannot carry:
+
+- **Eviction timing** was observed once in the source study; the `pbe = 30000`
+  constant was read from a Claude Code binary that has since changed versions and
+  has **not been re-verified**, which is why its status is `asserted` rather than
+  `single-study`. The encounter-before-return rule survives on durability grounds
+  regardless of the number.
+- **The adoption measurement** is the only `measured` row, and it measures
+  whether the plugin gets used — not whether the method works.
+- **"Panels are for spread"** has a second, independent observation behind it
+  (`lenny-podcast-transcripts`, 2026-08-07, 10 personas) but same author and same
+  year, so it stays `single-study`.
 
 ## Never run in anger
 
@@ -89,6 +111,33 @@ indistinguishable from a real one at recall time. The project's answer is a rule
 ("never back-fill") rather than a mechanism, and a rule is only as good as the
 agent following it. A `provenance` field on encounters would make it structural.
 
+## The provenance lint's own limits
+
+`scripts/provenance_lint.py` enforces the rule at the bottom of this file. It is
+subject to that rule too, so: its precision was hand-judged at roughly **40-55%**
+over samples from the last 19 commits (`--measure` reproduces the run; the
+judging was one person, one pass, ~12 flagged lines).
+
+It stays **WARN-only permanently**. Not "until we tune it" — the residual false
+positives are not separable by this approach. Compare two lines it treats
+identically:
+
+- "A debate lane cannot precede a blind lane." — method doctrine, unbacked
+- "`verbatim` is never discarded, but its pointer is demoted." — a description
+  of implemented behavior, checkable by running the code
+
+They are the same sentence shape. Distinguishing them needs to know whether the
+statement is about the method or about the tool, which the text does not carry.
+Two rounds of tightening moved precision from ~40% to ~50% and then stalled.
+
+So treat a flag as a prompt to ask "is this doctrine or is this behavior", not as
+a verdict. A gate at this precision that could block commits would be trained
+away inside a week, which is worse than no gate.
+
+The `TABLE` arm is different and is reliable: it checks that every row has a
+valid status and an evidence path that resolves on disk. That part is
+deterministic and could be made blocking safely.
+
 ## What is genuinely solid
 
 Not everything is soft, and over-correcting is its own failure:
@@ -114,3 +163,13 @@ When you add a claim to the docs, add its provenance to the table above in the
 same commit. A claim that enters this repo without one becomes indistinguishable
 from a validated finding within about two commits, which is how the current
 declarative voice happened in the first place.
+
+```bash
+python3 scripts/provenance_lint.py            # staged changes
+python3 scripts/provenance_lint.py --measure  # its own precision, on real history
+python3 scripts/test_provenance_lint.py
+```
+
+It warns; it does not block, and it is not going to. Read a flag as a question —
+"is this line doctrine, or is it a description of what the code does?" — and
+either add the row or move on.
