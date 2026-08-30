@@ -1,6 +1,7 @@
 ---
 name: agent-ux-review
 description: Use when reviewing or improving an AGENT-FACING surface — CLI help text, error messages, skill/tool/MCP descriptions, hook output, protocol frames or labels, onboarding docs, work-order briefs — by casting a cold agent as its real consumer. Triggers on "agent UX", "cold-reader review", "will an agent understand this", "review this CLI/error/skill description", "audit agent-facing surfaces". Not for human-facing UI (use IBR / persona-review) and not for code correctness review (use code review).
+user-invocable: false
 ---
 
 # Agent UX Review — cold-agent consumer testing for agent-facing surfaces
