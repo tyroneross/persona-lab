@@ -7,3 +7,7 @@ node_modules/
 encounters/**/engine/
 encounters/**/rosslabs-integration-plan.md
 .build-loop/
+
+# Rally runtime state — only manifest.json ships (mirrors agent-rally-point convention)
+.rally/*
+!.rally/manifest.json
